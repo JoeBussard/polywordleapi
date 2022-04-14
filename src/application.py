@@ -240,6 +240,16 @@ def test2():
         pretty_print_blank_lines(emoji_hash, 'white')
     pretty_print_keyboard(key_map)
 
+    print("this is key_map")
+    json_status_dict = {}
+    json_status_dict['keyboard'] = key_map
+    json_status_dict['game_id'] = 0
+    json_status_dict['turn'] = guesses
+    print(key_map)
+    print("this is the json response")
+    print(json_status_dict)
+    print(json.dumps(json_status_dict, indent=4))
+
     while guesses < 6:
         invalid_guess = True
         while invalid_guess:
@@ -258,6 +268,13 @@ def test2():
         # note sure if this is right
         index_color_map, key_map = update_all(current_guess, todays_word, key_map, index_map_history)
         guess_history.append(current_guess)
+
+        print("now printing the json response")
+        json_status_dict['keyboard'] = key_map
+        json_status_dict['index_color_map_history'] = index_map_history
+        json_status_dict['turn'] = guesses
+        print(json.dumps(json_status_dict, indent=4))
+
 
         # clear screen
         for x in range(50):print("")

@@ -3,7 +3,7 @@
 ### Misc.
 
 * Scan design documents
-* Set up git, github
+* Set up git, github **done, done**
 
 ### Features
 
