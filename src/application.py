@@ -279,6 +279,7 @@ def test2():
         json_status_dict['keyboard'] = key_map
         json_status_dict['index_color_map_history'] = index_map_history
         json_status_dict['turn'] = guesses
+        json_status_dict['guess_history'] = guess_history
         print(json.dumps(json_status_dict, indent=4))
 
 
