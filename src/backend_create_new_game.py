@@ -24,17 +24,20 @@ text_hash = {'present':text_colors.YELLOW,'correct':text_colors.GREEN,'absent':t
 class GameState:
   # One game state per user
 
-  def __init__(self, user_id, randomWord=True):
+  def __init__(self, user_id, fromCache=False, randomWord=True):
     backend_setup.print_err(f"initializing a new game state for {user_id}")
-    self.data = {}
-    self.data['user_id'] = user_id
-    self.data['keyboard_map'] = create_keyboard_map()
-    self.data['progress_grid_history'] = []
-    self.data['front_end'] = 'JSON'
-    self.data['turn'] = 0
-    self.data['solution'] = 'based' ### TODO - hardcoded for testing
-    self.data['guess_history'] = []
-    self.data['current_guess'] = ''
+    if not fromCache:
+      self.data = {}
+      self.data['user_id'] = user_id
+      self.data['keyboard_map'] = create_keyboard_map()
+      self.data['progress_grid_history'] = []
+      self.data['front_end'] = 'JSON'
+      self.data['turn'] = 0
+      self.data['solution'] = 'based' ### TODO - hardcoded for testing
+      self.data['guess_history'] = []
+      self.data['current_guess'] = ''
+    else:
+      self.create_new_from_cache(user_id)
 
   def set_solution(self, new_solution):
     backend_setup.print_err(f'Changing the solution for {self.user_id} from {self.data["solution"]} to {new_solution}')
@@ -48,6 +51,23 @@ class GameState:
       public_data[field] = self.data[field]
     return public_data
 
+  def create_new_from_cache(self, user_id):
+    data_ptr =  backend_setup.GameStateCache.load_game_data_from_cache(user_id)
+    for key in data_ptr.keys():
+      self.data[key] = data_ptr[key]
+
+  def create_new_from_cache_data(self, user_id, keyboard_map, progress_grid_history, front_end, turn, solution, guess_history, current_guess):
+    backend_setup.print_err(f"Creating new game state object for {user_id} from cache")
+    self.data = {}
+    self.data['user_id'] = user_id
+    self.data['keyboard_map'] = keyboard_map
+    self.data['progress_grid_history'] = progress_grid_history
+    self.data['front_end'] = front_end
+    self.data['turn'] = turn
+    self.data['solution'] = solution ### TODO - hardcoded for testing
+    self.data['guess_history'] = guess_history
+    self.data['current_guess'] = current_guess
+
 def create_keyboard_map():
     """Creates the keyboard map. Initializes everything to "grey" because
     the user does not know if the letter is in use or not."""
@@ -58,6 +78,8 @@ def create_keyboard_map():
         i = i.lower()
         key_map[i] = 'plain'
     return key_map
+
+
 
 # def create_emoji_hash():
 #     """returns a dict object hashmap that maps color words to emojis"""

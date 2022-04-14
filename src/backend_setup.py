@@ -37,6 +37,7 @@ class GameStateCache:
         'front_end',
         'turn',
         'secret_word',
+        'solution',
         'guess_history',
         'current_guess'
         ]
@@ -46,42 +47,54 @@ class GameStateCache:
       ## If i ever scale to that point
         self.cache_id = cache_id
         self.game_states = {}
+        self.game_states_data = {}
+        print_err(f'Created a new game state cache.')
 
-    def save_game_to_cache(self, user_id, game_data):
+
+    def save_game_state_to_cache(self, game_state_object):
+      if game_state_object.data['user_id'] in self.game_states.keys():
+        print_err(f'Updating game state for game {game_state_object.data["user_id"]} in cache {self.cache_id}')
+      else:
+        print_err(f'Saving new game state for game {game_state_object.data["user_id"]} in cache{self.cache_id}')
+      self.game_states[game_state_object.data['user_id']] = game_state_object
+
+    def save_game_data_to_cache(self, user_id, game_data):
       # user_id because only one game at a time per user
       # game_data should be a json file.
-      if user_id in self.game_states.keys():
+      if user_id in self.game_states_data.keys():
         print_err(f'Updating game state for game {user_id} in cache {self.cache_id}')
       else:
-        print_err(f'Creating new game state for game {user_id} in cache{self.cache_id}')
-      if type(game_data) != 'dict':
+        print_err(f'Saving new game state for game {user_id} in cache{self.cache_id}')
+        self.game_states_data[user_id] = {}
+      if type(game_data) != dict:
         print_err(f'Data for {user_id} was not a dict')
         return False
 
       for key in game_data.keys():
-        if type(key) != 'str':
-          print_err(f'Tried saving something weird to {self.cache_id}')
-          return False
+        # if type(key) != 'str':
+        #   print_err(f'Tried saving something weird to {self.cache_id}')
+        #   return False
         str_key = str(key).lower()
         if str_key in self.acceptable_state_fields:
-          self.game_states[user_id][str_key] = game_data[str_key]
+          self.game_states_data[user_id][str_key] = game_data[str_key]
           print_err(f'Saved {str_key} for {user_id} in cache.')
         else:
           print_err(f'Err: {str_key} is not an acceptable field to be cached.')
 
-    def load_game_from_cache(self, user_id):
+    def load_game_data_from_cache(self, user_id):
       ### Just loads a game from the cache
-      if user_id in self.game_states.keys():
+      if user_id in self.game_states_data.keys():
         print_err(f'Loading game data for {user_id} from cache.')
+        return self.game_states_data[user_id]
       else:
         print_err(f'No game data found for {user_id} in cache {self.cache_id}')
         return False
 
-    def delete_game_from_cache(self, user_id):
+    def delete_game_data_from_cache(self, user_id):
       ## Make sure you auth'ed before calling this
-      if user_id in self.game_states.keys():
+      if user_id in self.game_states_data.keys():
         print_err(f'Deleting game data for {user_id} from cache.')
-        del self.game_dates[key]
+        del self.game_states_data[key]
         return True
       else:
         print_err(f'Cannot delete game data for {user_id} from cache: User not found')
@@ -98,11 +111,11 @@ class GameStateCache:
       print_err(json.dumps(self.game_data, indent=2, sort_keys=True))
 
 
-def start_up_game_backend():
+def start_up_game_backend(cache_id):
     """ Boot strapping the game server"""
     print_err("Booting up Polywordle v.0.0.1")
 
-    my_cache = GameStateCache('A')
+    my_cache = GameStateCache(cache_id)
 
     common_words, all_words = load_dicts_from_json()
 
