@@ -5,6 +5,7 @@ import re
 import random
 import json
 import backend_setup
+import requests
 
 CHEATING = False
 
@@ -24,11 +25,14 @@ text_hash = {'present':text_colors.YELLOW,'correct':text_colors.GREEN,'absent':t
 class GameState:
   # One game state per user
 
-  def __init__(self, user_id, fromCache=False, randomWord=True):
+  def __init__(self, uuid=None, user_id="Anon", fromCache=False, randomWord=True):
     backend_setup.print_err(f"initializing a new game state for {user_id}")
     if not fromCache:
       self.data = {}
       self.data['user_id'] = user_id
+      new_uuid = requests.get("https://www.uuidtools.com/api/generate/v4")
+      uuid_str = str(json.loads(new_uuid.content.decode('utf-8'))[0])
+      self.data['uuid'] == uuid_str
       self.data['keyboard_map'] = create_keyboard_map()
       self.data['progress_grid_history'] = []
       self.data['front_end'] = 'JSON'
@@ -37,29 +41,41 @@ class GameState:
       self.data['guess_history'] = []
       self.data['current_guess'] = ''
     else:
-      self.create_new_from_cache(user_id)
+      if uuid:
+        self.create_new_from_cache(uuid)
+      else:
+        print("No game with uuid {uuid} exists.")
+
+
+  def uuid(self):
+    if self.data['uuid']:
+      return self.data['uuid']
+    else:
+      return None
 
   def set_solution(self, new_solution):
-    backend_setup.print_err(f'Changing the solution for {self.data["user_id"]} from {self.data["solution"]} to {new_solution}')
+    backend_setup.print_err(f'Changing the solution for {self.data["uuid"]} from {self.data["solution"]} to {new_solution}')
     self.data['solution'] = new_solution
 
   def get_public_data(self):
     # For returning parts of data that should be given to the client, ie, not the solution.
     public_data = {}
     # TODO this doesn't actually create an entirely new dictionary?
-    backend_setup.print_err(f'Creating new dictionary object for public data for {self.data["user_id"]}.')
-    for field in ['user_id', 'keyboard_map', 'progress_grid_history', 'front_end', 'turn', 'guess_history']:
+    backend_setup.print_err(f'Creating new dictionary object for public data for {self.data["uuid"]}.')
+    for field in ['uuid', 'user_id', 'keyboard_map', 'progress_grid_history', 'front_end', 'turn', 'guess_history']:
       public_data[field] = self.data[field]
     return public_data
 
-  def create_new_from_cache(self, user_id):
-    data_ptr =  backend_setup.GameStateCache.load_game_data_from_cache(user_id)
+# replace this with UUID
+  def create_new_from_cache(self, uuid):
+    data_ptr =  backend_setup.GameStateCache.load_game_data_from_cache(uuid)
     for key in data_ptr.keys():
       self.data[key] = data_ptr[key]
 
-  def create_new_from_cache_data(self, user_id, keyboard_map, progress_grid_history, front_end, turn, solution, guess_history, current_guess):
-    backend_setup.print_err(f"Creating new game state object for {user_id} from cache")
+  def create_new_from_cache_data(self, uuid, user_id, keyboard_map, progress_grid_history, front_end, turn, solution, guess_history, current_guess):
+    backend_setup.print_err(f"Creating new game state object for {uuid} from cache")
     self.data = {}
+    self.data['uuid'] = uuid
     self.data['user_id'] = user_id
     self.data['keyboard_map'] = keyboard_map
     self.data['progress_grid_history'] = progress_grid_history

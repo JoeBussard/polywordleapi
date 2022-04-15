@@ -19,24 +19,42 @@ myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 def hello_word():
   return "Polywordle API is alive", 200
 
-@app.route('/newgame/<user_id>', methods=['GET'])
-def api_new_game(user_id):
-  clipped_id = str(user_id)[:10]
-  newGameState = backend_create_new_game.GameState(clipped_id)
+@app.route('/v1/game', methods=['GET'])
+def api_new_game():
+  newGameState = backend_create_new_game.GameState()
   myCache.save_game_state_to_cache(newGameState)
-  return api_show_game( user_id)
+  return newGameState.uuid()
 
-@app.route('/game', methods=['GET'])
-def api_new_game_no_id():
-  new_id = 'random_id'
-  return api_new_game(new_id)
+@app.route('/v1/game', methods=['POST', 'PUT', 'DELETE'])
+def api_new_game_bad_method():
+  return "", 400
 
-@app.route('/game/<user_id>', methods=['GET'])
-def api_show_game(user_id):
-  clipped_id = str(user_id)[:10]
- # return myCache.game_states[clipped_id].get_public_data()
-  return backend_run_game.prepare_json_response(myCache.game_states[clipped_id])
+
+@app.route('/v1/game/<game_uuid>', methods=['GET'])
+def api_show_game(game_uuid):
+  good_game_uuid = str(game_uuid)
+  if good_game_uuid not in myCache.game_states:
+    return {"error":"game not found"}, 404
+  return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   
+@app.route('/v1/game/<game_uuid>', methods=['POST'])
+def api_game_new_guess(game_uuid):
+  good_game_uuid = str(game_uuid)
+  guess_data = request.get_json()
+  if 'guess' in guess_data:
+    current_guess = str(guess_data['guess'])[:5]
+  else:
+    return {"error":"no guess in post request"}
+
+
+  if good_game_uuid not in myCache.game_states:
+    return {"error": "game not found"}, 404
+
+
+
+
+
+
 @app.route('/game/<user_id>/<guess>', methods=["GET"])
 def api_process_guess(user_id, guess):
   global all_words
