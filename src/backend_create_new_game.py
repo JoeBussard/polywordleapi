@@ -40,13 +40,13 @@ class GameState:
       self.create_new_from_cache(user_id)
 
   def set_solution(self, new_solution):
-    backend_setup.print_err(f'Changing the solution for {self.user_id} from {self.data["solution"]} to {new_solution}')
+    backend_setup.print_err(f'Changing the solution for {self.data["user_id"]} from {self.data["solution"]} to {new_solution}')
     self.data['solution'] = new_solution
 
   def get_public_data(self):
     # For returning parts of data that should be given to the client, ie, not the solution.
     public_data = {}
-    backend_setup.print_err(f'Creating new dictionary object for public data for {self.user_id}.')
+    backend_setup.print_err(f'Creating new dictionary object for public data for {self.data["user_id"]}.')
     for field in ['user_id', 'keyboard_map', 'progress_grid_history', 'front_end', 'turn', 'guess_history']:
       public_data[field] = self.data[field]
     return public_data
