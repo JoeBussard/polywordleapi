@@ -46,6 +46,7 @@ class GameState:
   def get_public_data(self):
     # For returning parts of data that should be given to the client, ie, not the solution.
     public_data = {}
+    # TODO this doesn't actually create an entirely new dictionary?
     backend_setup.print_err(f'Creating new dictionary object for public data for {self.data["user_id"]}.')
     for field in ['user_id', 'keyboard_map', 'progress_grid_history', 'front_end', 'turn', 'guess_history']:
       public_data[field] = self.data[field]

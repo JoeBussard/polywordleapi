@@ -108,7 +108,7 @@ class GameStateCache:
 
     def dump_cache_to_stderr(self):
       print_err(f'Printing data stored in cache {self.cache_id}...')
-      print_err(json.dumps(self.game_data, indent=2, sort_keys=True))
+      #print_err(json.dumps(self.game_data, indent=2, sort_keys=True))
 
 
 def start_up_game_backend(cache_id):

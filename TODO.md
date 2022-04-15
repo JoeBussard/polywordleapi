@@ -13,7 +13,7 @@
 ### System Design
 
 * Start requirements
-* Design back end code / data structures / classes
+* Design back end code / data structures / classes **progress**
 * Design interactions for different clients
 * Authentication research
 
@@ -24,27 +24,31 @@
 * PHP script for game interface
 * HTML/CSS for Web interface
 * Flask methods to interpret JSON for Discord
-* Flask methods for game input
+* Flask methods for game input **progress**
 
 ### API
 
-* Flask setup
-* Contractualize JSON format for v1
+* Flask setup **progress**
+* Contractualize JSON format for v.0.1
 * Versioning
-* GET new board
-* POST new guess
+* GET new board **done**
+* POST new guess **done**
 
 ### Backend
 
-* Separate functions
-* Remove unneeded functions
-* Refactor legacy code
-* Write ping function
+* Separate functions  **progress**
+* Remove unneeded functions **progress**
+* Refactor legacy code **progress**
+* Write ping function **progress**
 * Write testing functions
+* Tell user when they completed the game (win or lose)
+* Track turns
+* Stats
+* Security / Auth / Privatizing game
 
 ### Testing
 
-* Ping function
+* Ping function **works**
 * Prove a word was picked
 * Prove a word was remembered
 * Prove a guess was validated
