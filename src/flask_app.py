@@ -31,7 +31,6 @@ def api_new_game_no_id():
   new_id = 'random_id'
   return api_new_game(new_id)
 
-
 @app.route('/game/<user_id>', methods=['GET'])
 def api_show_game(user_id):
   clipped_id = str(user_id)[:10]
