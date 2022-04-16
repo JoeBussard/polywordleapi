@@ -23,7 +23,7 @@ def hello_word():
 def api_new_game():
   newGameState = backend_create_new_game.GameState()
   myCache.save_game_state_to_cache(newGameState)
-  return newGameState.uuid()
+  return {"game_uuid": newGameState.uuid()}, 200
 
 @app.route('/v1/game', methods=['POST', 'PUT', 'DELETE'])
 def api_new_game_bad_method():
@@ -37,14 +37,30 @@ def api_show_game(game_uuid):
     return {"error":"game not found"}, 404
   return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   
+### GUESS NEW WORD ###
+
 @app.route('/v1/game/<game_uuid>', methods=['POST'])
 def api_game_new_guess(game_uuid):
   good_game_uuid = str(game_uuid)
+  print('request json', request.get_json())
+  print('request headers', request.headers)
+  print('request values', request.values)
+  print("request data", request.get_data())
+  print("request form get etc.")
+  print(request.form.get('guess'))
   guess_data = request.get_json()
-  if 'guess' in guess_data:
-    current_guess = str(guess_data['guess'])[:5]
-  else:
-    return {"error":"no guess in post request"}
+
+  if guess_data is not None:
+    if 'guess' in guess_data:
+      current_guess = str(guess_data['guess'])[:5]
+      backend_run_game.validate_guess_input(current_guess, all_words)
+      backend_run_game.compare_guess_to_solution(current_guess, myCache.game_states[good_game_uuid].data['solution'])
+      return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
+  else: # lets see if it's part of a curl
+    return "", 500
+  #if request
+  #else:
+  #  return {"error":"no guess in post request"}
 
 
   if good_game_uuid not in myCache.game_states:

@@ -32,7 +32,7 @@ class GameState:
       self.data['user_id'] = user_id
       new_uuid = requests.get("https://www.uuidtools.com/api/generate/v4")
       uuid_str = str(json.loads(new_uuid.content.decode('utf-8'))[0])
-      self.data['uuid'] == uuid_str
+      self.data['uuid'] = uuid_str
       self.data['keyboard_map'] = create_keyboard_map()
       self.data['progress_grid_history'] = []
       self.data['front_end'] = 'JSON'

@@ -1,6 +1,6 @@
 <?php 
 
-require 'sage.phar';
+//require 'sage.phar';
 //sage('hello world');
 
   function curl_game ($userId = "") {
