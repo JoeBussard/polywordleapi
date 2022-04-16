@@ -31,6 +31,7 @@ class GameStateCache:
     # to be used to make sure i don't save malicious or wrong data
     acceptable_state_fields = [
         'user_id',
+        'uuid',
         'user_auth',
         'keyboard_map',
         'progress_grid_history',
@@ -52,22 +53,22 @@ class GameStateCache:
 
 
     def save_game_state_to_cache(self, game_state_object):
-      if game_state_object.data['user_id'] in self.game_states.keys():
-        print_err(f'Updating game state for game {game_state_object.data["user_id"]} in cache {self.cache_id}')
+      if game_state_object.data['uuid'] in self.game_states.keys():
+        print_err(f'Updating game state for game {game_state_object.data["uuid"]} in cache {self.cache_id}')
       else:
-        print_err(f'Saving new game state for game {game_state_object.data["user_id"]} in cache{self.cache_id}')
-      self.game_states[game_state_object.data['user_id']] = game_state_object
+        print_err(f'Saving new game state for game {game_state_object.data["uuid"]} in cache{self.cache_id}')
+      self.game_states[game_state_object.data['uuid']] = game_state_object
 
-    def save_game_data_to_cache(self, user_id, game_data):
+    def save_game_data_to_cache(self, uuid, game_data):
       # user_id because only one game at a time per user
       # game_data should be a json file.
-      if user_id in self.game_states_data.keys():
-        print_err(f'Updating game state for game {user_id} in cache {self.cache_id}')
+      if uuid in self.game_states_data.keys():
+        print_err(f'Updating game state for game {uuid} in cache {self.cache_id}')
       else:
-        print_err(f'Saving new game state for game {user_id} in cache{self.cache_id}')
-        self.game_states_data[user_id] = {}
+        print_err(f'Saving new game state for game {uuid} in cache{self.cache_id}')
+        self.game_states_data[uuid] = {}
       if type(game_data) != dict:
-        print_err(f'Data for {user_id} was not a dict')
+        print_err(f'Data for {uuid} was not a dict')
         return False
 
       for key in game_data.keys():
@@ -76,28 +77,28 @@ class GameStateCache:
         #   return False
         str_key = str(key).lower()
         if str_key in self.acceptable_state_fields:
-          self.game_states_data[user_id][str_key] = game_data[str_key]
-          print_err(f'Saved {str_key} for {user_id} in cache.')
+          self.game_states_data[uuid][str_key] = game_data[str_key]
+          print_err(f'Saved {str_key} for {uuid} in cache.')
         else:
           print_err(f'Err: {str_key} is not an acceptable field to be cached.')
 
-    def load_game_data_from_cache(self, user_id):
+    def load_game_data_from_cache(self, uuid):
       ### Just loads a game from the cache
-      if user_id in self.game_states_data.keys():
-        print_err(f'Loading game data for {user_id} from cache.')
-        return self.game_states_data[user_id]
+      if uuid in self.game_states_data.keys():
+        print_err(f'Loading game data for {uuid} from cache.')
+        return self.game_states_data[uuid]
       else:
-        print_err(f'No game data found for {user_id} in cache {self.cache_id}')
+        print_err(f'No game data found for {uuid} in cache {self.cache_id}')
         return False
 
-    def delete_game_data_from_cache(self, user_id):
+    def delete_game_data_from_cache(self, uuid):
       ## Make sure you auth'ed before calling this
-      if user_id in self.game_states_data.keys():
-        print_err(f'Deleting game data for {user_id} from cache.')
+      if uuid in self.game_states_data.keys():
+        print_err(f'Deleting game data for {uuid} from cache.')
         del self.game_states_data[key]
         return True
       else:
-        print_err(f'Cannot delete game data for {user_id} from cache: User not found')
+        print_err(f'Cannot delete game data for {uuid} from cache: User not found')
         return False
 
     def save_cache_to_disk(self, file_name):
