@@ -12,7 +12,6 @@ app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
 ## Initialize server
-print_err("Booting up...")
 
 myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 
