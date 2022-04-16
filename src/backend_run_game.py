@@ -9,19 +9,19 @@ import backend_create_new_game
 
 def process_new_guess(guess, game_state, all_words):
   # Does everything needed to process a new guess.
-    if len(game_state.data['progress_grid_history']) > 5:
+    if len(game_state.data['progress_grid_history']) > 6:
         print("Something wrong")
-        return None
+        return {"error": "Game already has more than 6 guesses"}
     print("processing new guess")
     check_for_bad_input = validate_guess_input(guess, all_words)
-    if check_for_bad_input is not None:
+    if "error" in check_for_bad_input:
         return check_for_bad_input
     solution = game_state.data['solution']
     new_progress_row = compare_guess_to_solution(guess, solution)
     update_keyboard(game_state.data['keyboard_map'], new_progress_row, guess)
     game_state.data['guess_history'].append(guess)
     game_state.data['progress_grid_history'].append(new_progress_row)
-    return None
+    return {"success":"game state updated"}
 
 def validate_guess_input(guess, all_words):
     if len(guess) != 5:
@@ -31,7 +31,7 @@ def validate_guess_input(guess, all_words):
         return {"error": "Word must be only letters"}
     if guess.lower() not in list(all_words.values()):
         return {"error": "Word not in dictionary"}
-    return None
+    return {"success":""}
 
 def compare_guess_to_solution(guess, solution):
     """trying to get this to o(n) time, but still o(n^2) to check yellows."""

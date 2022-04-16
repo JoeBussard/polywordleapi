@@ -12,6 +12,7 @@ app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
 ## Initialize server
+print_err("Booting up...")
 
 myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 
@@ -51,10 +52,15 @@ def api_game_new_guess(game_uuid):
 #         backend_run_game.compare_guess_to_solution(current_guess, myCache.game_states[good_game_uuid].data['solution'])
 #         return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
 #   except request.on_json_loading_failed():
+
   if request.form.get('guess') != None:
     current_guess = str(request.form.get('guess'))[:8]
-    backend_run_game.validate_guess_input(current_guess, all_words)
-    backend_run_game.compare_guess_to_solution(current_guess, myCache.game_states[good_game_uuid].data['solution'])
+    print_err("Recieved guess:",current_guess)
+    valid_input = backend_run_game.validate_guess_input(current_guess, all_words)
+    guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
+    if "error" in guess_result:
+      print_err(valid_input['error'])
+      return valid_input, 200 
     return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
 
   else: # lets see if it's part of a curl
