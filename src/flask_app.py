@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, redirect, url_for
+from backend_setup import print_err
 
 import re
 import json
@@ -6,64 +7,65 @@ import json
 import backend_setup
 import backend_create_new_game
 import backend_run_game
-from backend_setup import print_err
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
-## Initialize server
-
+# Initialize server
 myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 
+# Ping
 @app.route('/')
 def hello_word():
   return "Polywordle API is alive", 200
 
+# Creating a new game
 @app.route('/v1/game', methods=['GET'])
 def api_new_game():
   newGameState = backend_create_new_game.GameState()
-  myCache.save_game_state_to_cache(newGameState)
-  return newGameState.uuid()
+  result = myCache.save_game_state_to_cache(newGameState)
+  if "error" in result:
+    return result, 404
+  return {"game_uuid": newGameState.uuid()}, 200
 
 @app.route('/v1/game', methods=['POST', 'PUT', 'DELETE'])
 def api_new_game_bad_method():
   return "", 400
 
-
+# Getting status of game in cache
 @app.route('/v1/game/<game_uuid>', methods=['GET'])
 def api_show_game(game_uuid):
-  good_game_uuid = str(game_uuid)
+  good_game_uuid = str(game_uuid)[:40]
   if good_game_uuid not in myCache.game_states:
     return {"error":"game not found"}, 404
   return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
-  
+
+# Guessing new word
 @app.route('/v1/game/<game_uuid>', methods=['POST'])
 def api_game_new_guess(game_uuid):
-  good_game_uuid = str(game_uuid)
-  guess_data = request.get_json()
-  if 'guess' in guess_data:
-    current_guess = str(guess_data['guess'])[:5]
-  else:
-    return {"error":"no guess in post request"}
-
-
+  game_uuid = game_uuid[:40]
+  good_game_uuid = str(game_uuid)[:8]
   if good_game_uuid not in myCache.game_states:
-    return {"error": "game not found"}, 404
+    return {"error": "No game found for that UUID"}, 404 
 
+  guess_data = request.get_json()
+  if guess_data != None:
+    if 'guess' in guess_data:
+      current_guess = str(guess_data['guess'])[:8]
+      guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
+      if "error" in guess_result:
+        print_err(guess_result['error'])
+        return guess_result, 200 
+      return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
 
-
-
-
-
-@app.route('/game/<user_id>/<guess>', methods=["GET"])
-def api_process_guess(user_id, guess):
-  global all_words
-  clipped_id = str(user_id)[:10]
-  clipped_guess = str(guess)[:10]
-#  backend_run_game.process_new_guess(clipped_guess, myCache.game_states[clipped_id], all_words)
-#  return myCache.game_states[clipped_id].get_public_data()
-  backend_run_game.process_new_guess(clipped_guess, myCache.game_states[clipped_id], all_words)
-  return backend_run_game.prepare_json_response(myCache.game_states[clipped_id])
-
-    
-
+  elif request.form.get('guess') != None:
+    current_guess = str(request.form.get('guess'))[:8]
+    print_err("Recieved guess:",current_guess)
+    guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
+    if "error" in guess_result:
+      print_err(guess_result['error'])
+      return guess_result, 200 
+    return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
+  
+  else:
+    return {"error":"POST methods require a guess"}, 400
