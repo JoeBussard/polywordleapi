@@ -42,20 +42,21 @@ def api_show_game(game_uuid):
 @app.route('/v1/game/<game_uuid>', methods=['POST'])
 def api_game_new_guess(game_uuid):
   good_game_uuid = str(game_uuid)
-  print('request json', request.get_json())
-  print('request headers', request.headers)
-  print('request values', request.values)
-  print("request data", request.get_data())
-  print("request form get etc.")
-  print(request.form.get('guess'))
-  guess_data = request.get_json()
+#   try: 
+#     guess_data = request.get_json()
+#     if guess_data is not None:
+#       if 'guess' in guess_data:
+#         current_guess = str(guess_data['guess'])[:8]
+#         backend_run_game.validate_guess_input(current_guess, all_words)
+#         backend_run_game.compare_guess_to_solution(current_guess, myCache.game_states[good_game_uuid].data['solution'])
+#         return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
+#   except request.on_json_loading_failed():
+  if request.form.get('guess') != None:
+    current_guess = str(request.form.get('guess'))[:8]
+    backend_run_game.validate_guess_input(current_guess, all_words)
+    backend_run_game.compare_guess_to_solution(current_guess, myCache.game_states[good_game_uuid].data['solution'])
+    return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
 
-  if guess_data is not None:
-    if 'guess' in guess_data:
-      current_guess = str(guess_data['guess'])[:5]
-      backend_run_game.validate_guess_input(current_guess, all_words)
-      backend_run_game.compare_guess_to_solution(current_guess, myCache.game_states[good_game_uuid].data['solution'])
-      return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   else: # lets see if it's part of a curl
     return "", 500
   #if request
