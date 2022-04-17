@@ -1,5 +1,9 @@
 from flask import Flask, jsonify, request, redirect, url_for
-from backend_setup import print_err
+from werkzeug.exceptions import TooManyRequests
+
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
 
 import re
 import json
@@ -7,9 +11,16 @@ import json
 import backend_setup
 import backend_create_new_game
 import backend_run_game
+from backend_setup import print_err
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["30 per minute"]
+    )
 
 # Initialize server
 myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
@@ -17,16 +28,22 @@ myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 # Ping
 @app.route('/')
 def hello_word():
-  return "Polywordle API is alive", 200
+  return "Polywordle API is alive", 429
 
 # Creating a new game
 @app.route('/v1/game', methods=['POST'])
+@limiter.limit("20 per minute") 
 def api_new_game():
-  newGameState = backend_create_new_game.GameState()
-  result = myCache.save_game_state_to_cache(newGameState)
-  if "error" in result:
-    return result, 404
-  return {"game_uuid": newGameState.uuid()}, 200
+  try:
+    newGameState = backend_create_new_game.GameState()
+    result = myCache.save_game_state_to_cache(newGameState)
+    if "error" in result:
+      return result, 404
+    return {"game_uuid": newGameState.uuid()}, 200
+  except TooManyRequests as e:
+    return "", 429
+    print(e)
+
 
 @app.route('/v1/game', methods=['GET'])
 def api_new_game_wrong_method():
