@@ -80,5 +80,30 @@ in Flask, and presumably easy in JavaScript, but not when I am
 trying to send out a single request to unit test my program.
 
 
+*Itempotency*
+
+Idempotency is actually a lot more important than I thought. It did 
+not seem like a huge deal at first, since it's a silly sounding 
+word describing a somewhat abstract concept. After thinking about the 
+currently available endpoints and their HTTP methods, I've learned 
+that API v1 currently violates the concept of idempotency and as 
+such should be modified in-place before being worthy of the title v1.
+
+GET, PUT, and DELETE are three idempotent HTTP methods. There are 
+other HTTP methods but they are out of the scope of v1 and this 
+project entirely. I like to think that GET is idepoptent because 
+when you reload a web page you get the same result again and the 
+server doesn't really care.
+
+Currently sending a GET request to /v1/game is not idempotent. 
+It creates a new server resource; namely, a new game, and it returns 
+the UUID of the new game.  This was cool when I was testing because 
+I could generate a new UUID to test with just by directing my web 
+browser to the endpoint, but it is not cool with RESTful API 
+standards.
+
+I will have to change /v1/game to only create new games on a POST 
+request.  People seem to disagree on whether POST requests **have** 
+to have data payloads. I am good with using POSTs with no payload.
 
 
