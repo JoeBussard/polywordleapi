@@ -20,7 +20,7 @@ def hello_word():
   return "Polywordle API is alive", 200
 
 # Creating a new game
-@app.route('/v1/game', methods=['GET'])
+@app.route('/v1/game', methods=['POST'])
 def api_new_game():
   newGameState = backend_create_new_game.GameState()
   result = myCache.save_game_state_to_cache(newGameState)
@@ -28,9 +28,9 @@ def api_new_game():
     return result, 404
   return {"game_uuid": newGameState.uuid()}, 200
 
-@app.route('/v1/game', methods=['POST', 'PUT', 'DELETE'])
-def api_new_game_bad_method():
-  return "", 400
+@app.route('/v1/game', methods=['GET'])
+def api_new_game_wrong_method():
+  return {"error":"Missing game ID in URL"}, 400
 
 # Getting status of game in cache
 @app.route('/v1/game/<game_uuid>', methods=['GET'])
@@ -43,8 +43,7 @@ def api_show_game(game_uuid):
 # Guessing new word
 @app.route('/v1/game/<game_uuid>', methods=['POST'])
 def api_game_new_guess(game_uuid):
-  game_uuid = game_uuid[:40]
-  good_game_uuid = str(game_uuid)[:8]
+  good_game_uuid = str(game_uuid)[:40]
   if good_game_uuid not in myCache.game_states:
     return {"error": "No game found for that UUID"}, 404 
 
