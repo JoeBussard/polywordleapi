@@ -1,4 +1,4 @@
-# Polywordle API
+# Polywordle API 💻
 
 **Welcome 😀 to the Polywordle API**
 
@@ -7,7 +7,7 @@ Polywordle. Just make your own client, (which could even be Postman or
 `curl` if you are so inclined 😮) and you can play any time you want. You 
 get an infinite number of words per day.
 
-### Installation
+### Installation 🛠️
 
 **Linux 🐧**
 
@@ -15,15 +15,7 @@ get an infinite number of words per day.
 
 `pip install requirements.txt`
 
-**MacOS 🍎**
-
-tbd
-
-**Windows 🪟**
-
-tbd
-
-### Running
+### Running 👟
 
 `cd polywordleapi/src/api`
 
@@ -33,7 +25,7 @@ tbd
 
 The API server will now be running at `127.0.0.1:5000`
 
-### Interaction
+### Interaction 🎮
 
 Have your client send an empty `POST` request to `/v1/game` to get
 a UUID for your game.
@@ -45,6 +37,7 @@ as a form field to `/v1/game/<your_uuid>` to make a new guess.
 
 That is all you need to play the game. Have fun.
 
-*Please note this is a humble portfolio project by a new university graduate*
+*This is a portfolio project by a new university grad. Let me know 
+if you like it and your company is hiring* 🎓
 
 
