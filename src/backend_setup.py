@@ -57,8 +57,9 @@ class GameStateCache:
         print_err(f'Updating game state for game {game_state_object.data["uuid"]} in cache {self.cache_id}')
       else:
         print_err(f'Saving new game state for game {game_state_object.data["uuid"]} in cache{self.cache_id}')
-        if len(self.game_states.keys()) > 100:
+        if len(self.game_states.keys()) > 1000:
           print_err(f'Rate limit: Refusing to create more than 100 games at a time')
+          raise 
           return {"error":"Game state cache full"}
       self.game_states[game_state_object.data['uuid']] = game_state_object
       return {"success":"game state updated/saved"}

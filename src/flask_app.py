@@ -19,7 +19,7 @@ app.config['JSON_SORT_KEYS'] = False
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=["30 per minute"]
+    default_limits=["90 per minute"]
     )
 
 # Initialize server
@@ -32,7 +32,7 @@ def hello_word():
 
 # Creating a new game
 @app.route('/v1/game', methods=['POST'])
-@limiter.limit("20 per minute") 
+@limiter.limit("55 per minute") 
 def api_new_game():
   try:
     newGameState = backend_create_new_game.GameState()
@@ -41,6 +41,7 @@ def api_new_game():
       return result, 404
     return {"game_uuid": newGameState.uuid()}, 200
   except TooManyRequests as e:
+    del(newGameState)
     return "", 429
     print(e)
 
