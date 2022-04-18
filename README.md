@@ -3,7 +3,7 @@
 **Welcome 😀 to the Polywordle API**
 
 You can download and run this API on your own server to host a game of 
-Polywordle. Just make your own client, (which could even be Postman or 
+Polywordle. Just make your own client, (you could even use Postman or 
 `curl` if you are so inclined 😮) and you can play any time you want. You 
 get an infinite number of words per day.
 
