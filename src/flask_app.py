@@ -54,13 +54,19 @@ def api_new_game():
 def api_new_game_wrong_method():
   return {"error":"Missing game ID in URL"}, 400
 
+
 # Getting status of game in cache
 @app.route('/v1/game/<game_uuid>', methods=['GET'])
 def api_show_game(game_uuid):
   good_game_uuid = str(game_uuid)[:40]
   if good_game_uuid not in myCache.game_states:
     return {"error":"game not found"}, 404
-  return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
+  response = backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
+  if "error" in response:
+      return "", 404
+  else:
+    return response
+
 
 # Guessing new word
 @app.route('/v1/game/<game_uuid>', methods=['POST'])

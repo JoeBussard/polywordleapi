@@ -9,9 +9,9 @@ import backend_create_new_game
 
 def process_new_guess(guess, game_state, all_words):
   # Does everything needed to process a new guess.
-    if len(game_state.data['progress_grid_history']) > 6:
+    if len(game_state.data['progress_grid_history']) > 5:
         print("Something wrong")
-        return {"error": "Game already has more than 6 guesses"}
+        return {"error": "Game already has 6 guesses"}
     print("processing new guess")
     check_for_bad_input = validate_guess_input(guess, all_words)
     if "error" in check_for_bad_input:
@@ -19,8 +19,11 @@ def process_new_guess(guess, game_state, all_words):
     solution = game_state.data['solution']
     new_progress_row = compare_guess_to_solution(guess, solution)
     update_keyboard(game_state.data['keyboard_map'], new_progress_row, guess)
+    update_efficient_key_map(game_state)
     game_state.data['guess_history'].append(guess)
     game_state.data['progress_grid_history'].append(new_progress_row)
+    update_guess_map(game_state)
+    game_state.data['turn'] += 1
     return {"success":"game state updated"}
 
 def validate_guess_input(guess, all_words):
@@ -59,30 +62,60 @@ def update_keyboard(key_map, progress_row, guess):
             key_map[guess[x]] = progress_row[x]
     return None
 
+
+def update_efficient_key_map(game_state):
+    """this is the map that says {'plain':'qwerty..'}"""
+    ekm = game_state.data['efficient_key_map']
+    for color in ['plain', 'absent', 'present', 'correct']:
+        ekm[color] = []
+    for letter in game_state.data['keyboard_map'].keys():
+        ekm[game_state.data['keyboard_map'][letter]].append(letter)
+
+def update_guess_map(game_state):
+    """using pointers to the game state, updates the map that shows the progress
+    of the whole game. The guess map is basically:
+    Turn 0 = {Letter:Color, Letter:color, Letter:color, Letter:color, Letter:color}
+    Turn 1 = {Letter:Color, Letter:color, Letter:color, Letter:color, Letter:color}
+    etc."""
+    progress = game_state.data['progress_grid_history']
+    guesses = game_state.data['guess_history']
+    guess_map = game_state.data['guess_map']
+    turn = game_state.data['turn']
+    guess_map.append([])
+    letter_color = [[guesses[turn][i], progress[turn][i]] for i in range(5)]
+    guess_map[turn] = letter_color
+    return 0
+
+
 def prepare_json_response(game_state):
     game_state_data = game_state.data
-    keyboard_map = game_state_data['keyboard_map']
-    prepped = game_state_data
-    efficient_key_map = {
-        'plain':[],
-        'absent':[],
-        'present':[],
-        'correct':[]
-        }
-    for letter in keyboard_map.keys():
-        efficient_key_map[keyboard_map[letter]].append(letter)
-    turn = len(game_state_data['progress_grid_history'])
-    progress_ptr = game_state_data['progress_grid_history']
-    guess_ptr = game_state_data['guess_history']
-    guess_map = []
-    for turn_no in range(turn):
-        guess_map.append([])
-        key_value = [[guess_ptr[turn_no][i], progress_ptr[turn_no][i]] for i in range(len(guess_ptr[turn_no]))]
-        guess_map[turn_no] = key_value
+    response = game_state.get_public_data() 
+    for field in ['uuid', 'user_id', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
+        if field not in response:
+            return {"error":"something wrong"}
+    return response
 
-    prepped['keyboard'] = efficient_key_map
-    prepped['guesses'] = guess_map
-    return prepped
+#     keyboard_map = game_state_data['keyboard_map']
+#     efficient_key_map = {
+#         'plain':[],
+#         'absent':[],
+#         'present':[],
+#         'correct':[]
+#         }
+#     for letter in keyboard_map.keys():
+#         efficient_key_map[keyboard_map[letter]].append(letter)
+#     turn = len(game_state_data['progress_grid_history'])
+#     progress_ptr = game_state_data['progress_grid_history']
+#     guess_ptr = game_state_data['guess_history']
+#     guess_map = []
+#     for turn_no in range(turn):
+#         guess_map.append([])
+#         key_value = [[guess_ptr[turn_no][i], progress_ptr[turn_no][i]] for i in range(len(guess_ptr[turn_no]))]
+#         guess_map[turn_no] = key_value
+# 
+#     prepped['keyboard'] = efficient_key_map
+#     prepped['guesses'] = guess_map
+#     return prepped
   
 
 

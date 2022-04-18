@@ -37,12 +37,20 @@ class GameState:
       uuid_str = str(json.loads(new_uuid.content.decode('utf-8'))[0])
       self.data['uuid'] = uuid_str
       self.data['keyboard_map'] = create_keyboard_map()
+      self.data['efficient_key_map'] = {
+          'plain':[],
+          'absent':[],
+          'present':[],
+          'correct':[]
+          }
       self.data['progress_grid_history'] = []
       self.data['front_end'] = 'JSON'
       self.data['turn'] = 0
       self.data['solution'] = 'based' ### TODO - hardcoded for testing
       self.data['guess_history'] = []
       self.data['current_guess'] = ''
+      self.data['guess_map'] = []
+      self.data['progress'] = "in progress"
     else:
       if uuid:
         self.create_new_from_cache(uuid)
@@ -63,9 +71,8 @@ class GameState:
   def get_public_data(self):
     # For returning parts of data that should be given to the client, ie, not the solution.
     public_data = {}
-    # TODO this doesn't actually create an entirely new dictionary?
     backend_setup.print_err(f'Creating new dictionary object for public data for {self.data["uuid"]}.')
-    for field in ['uuid', 'user_id', 'keyboard_map', 'progress_grid_history', 'front_end', 'turn', 'guess_history']:
+    for field in ['uuid', 'user_id', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
       public_data[field] = self.data[field]
     return public_data
 
@@ -87,6 +94,7 @@ class GameState:
     self.data['solution'] = solution ### TODO - hardcoded for testing
     self.data['guess_history'] = guess_history
     self.data['current_guess'] = current_guess
+    #self.data['guess_map'] = []
 
 def create_keyboard_map():
     """Creates the keyboard map. Initializes everything to "grey" because
@@ -99,6 +107,10 @@ def create_keyboard_map():
         key_map[i] = 'plain'
     return key_map
 
+def update_efficient_key_map(self):
+    ekm = self.data['efficient_key_map']
+    for letter in self.data['keyboard_map'].keys():
+        ekm[self.data['keyboard_map'][letter]].append(letter)
 
 
 # def create_emoji_hash():
