@@ -14,12 +14,15 @@ def process_new_guess(guess, game_state, all_words):
     print("processing new guess")
     check_for_bad_input = validate_guess_input(guess, all_words)
     if "error" in check_for_bad_input:
+        print("error with input")
+        print(check_for_bad_input)
         return check_for_bad_input
     solution = game_state.data['solution']
     new_progress_row, is_a_winner = compare_guess_to_solution(guess, solution)
     update_keyboard(game_state.data['keyboard_map'], new_progress_row, guess)
     update_efficient_key_map(game_state)
     game_state.data['guess_history'].append(guess)
+    print("appended guess")
     game_state.data['progress_grid_history'].append(new_progress_row)
     update_guess_map(game_state)
     game_state.data['turn'] += 1
@@ -34,6 +37,7 @@ def process_new_guess(guess, game_state, all_words):
 
 def validate_guess_input(guess, all_words):
     if len(guess) != 5:
+        print('here is guess', guess, 'here is len', len(guess))
         return {"error": "Word must be 5 letters"}
     pattern = re.compile("[A-Za-z]+")
     if not pattern.fullmatch(guess):

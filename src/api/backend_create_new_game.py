@@ -46,7 +46,7 @@ class GameState:
       self.data['progress_grid_history'] = []
       self.data['front_end'] = 'JSON'
       self.data['turn'] = 0
-      self.data['solution'] = 'based' ### TODO - hardcoded for testing
+      self.data['solution'] = "reset" ### TODO - hardcoded for testing
       self.data['guess_history'] = []
       self.data['current_guess'] = ''
       self.data['guess_map'] = []
@@ -68,6 +68,15 @@ class GameState:
   def set_solution(self, new_solution):
     backend_setup.print_err(f'Changing the solution for {self.data["uuid"]} from {self.data["solution"]} to {new_solution}')
     self.data['solution'] = new_solution
+
+  def set_random_solution(self, common_words):
+    rand_max = len(common_words)
+    todays_word_index = ""
+    while todays_word_index not in common_words:
+        todays_word_index = str(random.choice(range(rand_max)))
+    todays_word = common_words[todays_word_index]
+    self.data['solution'] = todays_word
+    return None
 
   def get_public_data(self):
     # For returning parts of data that should be given to the client, ie, not the solution.

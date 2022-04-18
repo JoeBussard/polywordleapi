@@ -40,6 +40,7 @@ def hello_world_v1():
 def api_new_game():
   try:
     newGameState = backend_create_new_game.GameState()
+    newGameState.set_random_solution(common_words)
     result = myCache.save_game_state_to_cache(newGameState)
     if "error" in result:
       return result, 404
@@ -96,10 +97,12 @@ def api_game_new_guess(game_uuid):
     current_guess = str(request.form.get('guess'))[:8]
     print_err("Recieved guess:",current_guess)
     if current_guess in myCache.game_states[game_uuid].data['guess_history']:
-      return {"error": "duplicate guess"}, 400
+      return {"error": "duplicate guess"}, 200
     guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
+    if "error" in guess_result:
+      return "something wrong", 500
     return {"success":"guess posted"}, 200
-    backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
+    #backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   
   else:
     return {"error":"POST methods require a guess"}, 400
