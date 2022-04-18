@@ -29,6 +29,8 @@ tbd
 
 `export FLASK_APP=flask_app.py`
 
+`flask run`
+
 The API server will now be running at `127.0.0.1:5000`
 
 ### Interaction
