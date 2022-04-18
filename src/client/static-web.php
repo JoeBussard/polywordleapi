@@ -1,4 +1,8 @@
-<?php 
+<?php
+// joe bussard
+/******************************
+This PHP Client sucks and should not be used by anyone
+**************/
 
 require 'sage.phar';
 sage($_POST);
