@@ -51,6 +51,7 @@ class GameState:
       self.data['current_guess'] = ''
       self.data['guess_map'] = []
       self.data['progress'] = "in progress"
+      self.data['public_solution'] = ""
     else:
       if uuid:
         self.create_new_from_cache(uuid)
@@ -72,7 +73,9 @@ class GameState:
     # For returning parts of data that should be given to the client, ie, not the solution.
     public_data = {}
     backend_setup.print_err(f'Creating new dictionary object for public data for {self.data["uuid"]}.')
-    for field in ['uuid', 'user_id', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
+    if self.data['public_solution'] != "":
+      public_data['public_solution'] = self.data['public_solution']
+    for field in ['uuid', 'user_id', 'progress', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
       public_data[field] = self.data[field]
     return public_data
 

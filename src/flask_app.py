@@ -80,18 +80,12 @@ def api_game_new_guess(game_uuid):
     if 'guess' in guess_data:
       current_guess = str(guess_data['guess'])[:8]
       guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
-      if "error" in guess_result:
-        print_err(guess_result['error'])
-        return guess_result, 200 
       return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
 
   elif request.form.get('guess') != None:
     current_guess = str(request.form.get('guess'))[:8]
     print_err("Recieved guess:",current_guess)
     guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
-    if "error" in guess_result:
-      print_err(guess_result['error'])
-      return guess_result, 200 
     return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   
   else:
