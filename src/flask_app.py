@@ -28,11 +28,11 @@ myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 # Ping
 @app.route('/')
 def hello_word():
-  return "Polywordle API is alive", 429
+  return "Polywordle API is alive", 200
 
 # Creating a new game
 @app.route('/v1/game', methods=['POST'])
-@limiter.limit("55 per minute") 
+@limiter.limit("30 per minute") 
 def api_new_game():
   try:
     newGameState = backend_create_new_game.GameState()
