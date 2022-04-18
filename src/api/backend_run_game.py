@@ -7,6 +7,7 @@ import json
 import backend_setup
 import backend_create_new_game
 
+
 def process_new_guess(guess, game_state, all_words):
   # Does everything needed to process a new guess.
     if len(game_state.data['progress_grid_history']) > 5:
@@ -67,7 +68,7 @@ def update_keyboard(key_map, progress_row, guess):
     """Input is a keyboard-status dictionary {'q': present, 'w':'absent', ... }
     .... It updates that keyboard map and returns it."""
     for x in progress_row:
-        if key_map[guess[x]] != 'present': # letters dont go from green to yellow
+        if key_map[guess[x]] != 'correct': # letters dont go from green to yellow
             key_map[guess[x]] = progress_row[x]
     return None
 
