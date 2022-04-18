@@ -10,21 +10,35 @@ import backend_create_new_game
 def process_new_guess(guess, game_state, all_words):
   # Does everything needed to process a new guess.
     if len(game_state.data['progress_grid_history']) > 5:
-        print("Something wrong")
-        return {"error": "Game already has 6 guesses"}
+        return "game over"
     print("processing new guess")
     check_for_bad_input = validate_guess_input(guess, all_words)
     if "error" in check_for_bad_input:
         return check_for_bad_input
     solution = game_state.data['solution']
-    new_progress_row = compare_guess_to_solution(guess, solution)
+    new_progress_row, is_a_winner = compare_guess_to_solution(guess, solution)
     update_keyboard(game_state.data['keyboard_map'], new_progress_row, guess)
     update_efficient_key_map(game_state)
     game_state.data['guess_history'].append(guess)
     game_state.data['progress_grid_history'].append(new_progress_row)
     update_guess_map(game_state)
     game_state.data['turn'] += 1
+    if is_a_winner == 2:
+        game_state.data['public_solution'] = game_state.data['solution']
+        game_state.data['progress'] = "victory"
+    elif is_a_winner == 1:
+        if len(game_state.data['guess_history']) >= 6:
+            game_state.data['public_solution'] = game_state.data['solution']
+            game_state.data['progress'] = "loss"
     return {"success":"game state updated"}
+
+def process_victory(game_state):
+    game_state.data['public_solution'] = game_state.data['solution']
+    game_state.data['progress'] = "victory"
+
+def process_loss(game_state):
+    pass
+
 
 def validate_guess_input(guess, all_words):
     if len(guess) != 5:
@@ -38,6 +52,10 @@ def validate_guess_input(guess, all_words):
 
 def compare_guess_to_solution(guess, solution):
     """trying to get this to o(n) time, but still o(n^2) to check yellows."""
+    if guess == solution:
+        winner = 2
+    else:
+        winner = 1
     guess_hash, solution_hash, result_hash = {}, {}, {}
     for i in range(5):
         guess_hash[i] = guess[i]
@@ -52,7 +70,7 @@ def compare_guess_to_solution(guess, solution):
             if guess_hash[guess_key] == solution_hash[solution_key] and result_hash[guess_key] == "absent":
                 result_hash[guess_key] = "present"
                 guess_hash[guess_key], solution_hash[solution_key] = "", ""
-    return result_hash
+    return result_hash, winner
 
 def update_keyboard(key_map, progress_row, guess):
     """Input is a keyboard-status dictionary {'q': present, 'w':'absent', ... }
@@ -90,7 +108,7 @@ def update_guess_map(game_state):
 def prepare_json_response(game_state):
     game_state_data = game_state.data
     response = game_state.get_public_data() 
-    for field in ['uuid', 'user_id', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
+    for field in ['uuid', 'user_id', 'progress', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
         if field not in response:
             return {"error":"something wrong"}
     return response
