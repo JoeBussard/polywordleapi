@@ -1,0 +1,3 @@
+This is not a real requirements.txt
+
+flask, flask-limiter, json, requests

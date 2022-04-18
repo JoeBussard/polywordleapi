@@ -6,6 +6,7 @@ import random
 import json
 import backend_setup
 import requests
+from werkzeug.exceptions import TooManyRequests
 
 CHEATING = False
 
@@ -31,6 +32,8 @@ class GameState:
       self.data = {}
       self.data['user_id'] = user_id
       new_uuid = requests.get("https://www.uuidtools.com/api/generate/v4")
+      if new_uuid.status_code == 429:
+        raise TooManyRequests()
       uuid_str = str(json.loads(new_uuid.content.decode('utf-8'))[0])
       self.data['uuid'] = uuid_str
       self.data['keyboard_map'] = create_keyboard_map()
