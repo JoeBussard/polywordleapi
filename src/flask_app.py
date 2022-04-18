@@ -32,7 +32,7 @@ def hello_world():
 
 @app.route('/v1')
 def hello_world_v1():
-  return "Polywordle /v1/ is live.", 200
+  return "Polywordle /v1/ is live. Send a POST to /v1/game to start a new game", 200
 
 # Creating a new game
 @app.route('/v1/game', methods=['POST'])
