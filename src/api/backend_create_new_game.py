@@ -76,6 +76,7 @@ class GameState:
         todays_word_index = str(random.choice(range(rand_max)))
     todays_word = common_words[todays_word_index]
     self.data['solution'] = todays_word
+    if CHEATING: self.data['solution'] = 'cheat'
     return None
 
   def get_public_data(self):
