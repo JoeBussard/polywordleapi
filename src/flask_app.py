@@ -28,7 +28,12 @@ myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 # Ping
 @app.route('/')
 def hello_word():
-  return "Polywordle API is alive", 200
+  return "Pong! We are live at version /v1/", 200
+
+@app.route('/v1')
+def hello_word():
+  return "Pong! Polywordle /v1/ is live.", 200
+
 
 # Creating a new game
 @app.route('/v1/game', methods=['POST'])
