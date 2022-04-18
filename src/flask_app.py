@@ -47,7 +47,6 @@ def api_new_game():
   except TooManyRequests as e:
     del(newGameState)
     return "", 429
-    print(e)
 
 
 @app.route('/v1/game', methods=['GET'])
@@ -74,19 +73,24 @@ def api_game_new_guess(game_uuid):
   good_game_uuid = str(game_uuid)[:40]
   game_uuid = good_game_uuid
   if good_game_uuid not in myCache.game_states:
-    return {"error": "No game found for that UUID"}, 404 
+    return {"error": "no game found for that UUID"}, 404 
 
   if myCache.game_states[good_game_uuid].data['progress'] in ['victory', 'loss']:
-    return 'game already over', 400
+    return {"error":"game already over"}, 200
 
   guess_data = request.get_json()
   if guess_data != None:
     if 'guess' in guess_data:
       current_guess = str(guess_data['guess'])[:8]
       if current_guess in myCache.game_states[game_uuid].data['guess_history']:
-          return {"error": "duplicate guess"}, 400
+          return {"error": "duplicate guess"}, 200
       guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
-      return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
+      if "error" in guess_result:
+        if "not in dictionary" in guess_result["error"]:
+          return {"error":"word not in dictionary"}, 200
+        if "only letters" in guess_result["error"]:
+          return {"error":"word must be only letters"}, 200
+      return {"success":"guess posted"}, 200
 
   elif request.form.get('guess') != None:
     current_guess = str(request.form.get('guess'))[:8]
@@ -94,7 +98,8 @@ def api_game_new_guess(game_uuid):
     if current_guess in myCache.game_states[game_uuid].data['guess_history']:
       return {"error": "duplicate guess"}, 400
     guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
-    return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
+    return {"success":"guess posted"}, 200
+    backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   
   else:
     return {"error":"POST methods require a guess"}, 400
