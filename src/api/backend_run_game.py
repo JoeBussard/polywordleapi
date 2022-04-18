@@ -18,8 +18,6 @@ def process_new_guess(guess, game_state, all_words):
     solution = game_state.data['solution']
     new_progress_row, is_a_winner = compare_guess_to_solution(guess, solution)
     update_keyboard(game_state.data['keyboard_map'], new_progress_row, guess)
-    print(game_state.data['keyboard_map'])
-    print(game_state.data['efficient_key_map'])
     update_efficient_key_map(game_state)
     game_state.data['guess_history'].append(guess)
     game_state.data['progress_grid_history'].append(new_progress_row)
