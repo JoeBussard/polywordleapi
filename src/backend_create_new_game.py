@@ -50,6 +50,7 @@ class GameState:
       self.data['guess_history'] = []
       self.data['current_guess'] = ''
       self.data['guess_map'] = []
+      self.data['progress'] = "in progress"
     else:
       if uuid:
         self.create_new_from_cache(uuid)
