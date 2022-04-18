@@ -72,19 +72,27 @@ def api_show_game(game_uuid):
 @app.route('/v1/game/<game_uuid>', methods=['POST'])
 def api_game_new_guess(game_uuid):
   good_game_uuid = str(game_uuid)[:40]
+  game_uuid = good_game_uuid
   if good_game_uuid not in myCache.game_states:
     return {"error": "No game found for that UUID"}, 404 
+
+  if myCache.game_states[good_game_uuid].data['progress'] in ['victory', 'loss']:
+    return 'game already over', 400
 
   guess_data = request.get_json()
   if guess_data != None:
     if 'guess' in guess_data:
       current_guess = str(guess_data['guess'])[:8]
+      if current_guess in myCache.game_states[game_uuid].data['guess_history']:
+          return {"error": "duplicate guess"}, 400
       guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
       return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
 
   elif request.form.get('guess') != None:
     current_guess = str(request.form.get('guess'))[:8]
     print_err("Recieved guess:",current_guess)
+    if current_guess in myCache.game_states[game_uuid].data['guess_history']:
+      return {"error": "duplicate guess"}, 400
     guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
     return backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   
