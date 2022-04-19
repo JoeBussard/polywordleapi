@@ -9,13 +9,7 @@ get an infinite number of words per day.
 
 ### Installation 🛠️
 
-**Linux 🐧**
-
-`git clone https://github.com/JoeBussard/polywordleapi`
-
-`pip install requirements.txt`
-
-macOS 🍎
+**Linux 🐧** & **macOS** 🍎
 
 `git clone https://github.com/JoeBussard/polywordleapi`
 
