@@ -13,11 +13,13 @@ get an infinite number of words per day.
 
 `git clone https://github.com/JoeBussard/polywordleapi`
 
+`cd polywordleapi`
+
 `pip install requirements.txt`
 
 ### Running 👟
 
-`cd polywordleapi/src/api`
+`cd src/api`
 
 `export FLASK_APP=flask_app.py`
 
