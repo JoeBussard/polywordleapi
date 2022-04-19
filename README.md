@@ -15,6 +15,12 @@ get an infinite number of words per day.
 
 `pip install requirements.txt`
 
+macOS 🍎
+
+`git clone https://github.com/JoeBussard/polywordleapi`
+
+`pip install requirements.txt`
+
 ### Running 👟
 
 `cd polywordleapi/src/api`
@@ -39,5 +45,3 @@ That is all you need to play the game. Have fun.
 
 *This is a portfolio project by a new university grad. Let me know 
 if you like it and your company is hiring* 🎓
-
-
