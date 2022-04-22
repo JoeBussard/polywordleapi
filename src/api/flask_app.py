@@ -91,6 +91,8 @@ def api_game_new_guess(game_uuid):
           return {"error":"word not in dictionary"}, 200
         if "only letters" in guess_result["error"]:
           return {"error":"word must be only letters"}, 200
+        else:
+          return {"error": guess_result}, 501
       return {"success":"guess posted"}, 200
 
   elif request.form.get('guess') != None:
@@ -100,7 +102,11 @@ def api_game_new_guess(game_uuid):
       return {"error": "duplicate guess"}, 200
     guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
     if "error" in guess_result:
-      return "something wrong", 500
+       return guess_result, 200
+#     if "only letters" in guess_result["error"]:
+#       return {"error":"word must be only letters"}, 200
+#     else:
+#       return {"error": guess_result}, 501
     return {"success":"guess posted"}, 200
     #backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   

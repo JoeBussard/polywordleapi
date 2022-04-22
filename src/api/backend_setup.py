@@ -1,6 +1,29 @@
 #!/bin/python
 # copyright 2022 joe bussard
-# This is for setting up the server's backend. This is run once, and it is run when the game is brought online.
+####################################################
+#         backend_setup.py
+# 
+#  Includes:   - print_err  function
+#              - load_dicts_from_json function
+#              - GameStateCache function
+#              - start_up_game_backend function
+#
+# The print_err function can be used instead of print() to
+# print directly to stderr.
+#
+# The load_dicts_from_json reads JSON files "all_words.json"
+# and "common_words.json" from disk and saves them as 
+# 2 dictionaries in memory.
+#
+# The GameStateCache has a dictionary of active games,
+# As well as some functions for saving the cache to disk
+# in case the server needs to scale and save games to disk
+# instead of in memory.
+#
+# The start_up_game_backend function creates a new 
+# GameStateCache and loads the dictionaries into memory to 
+# bootsrap a new instance of the Polywordle server.
+########################################################
 
 import re
 import random
