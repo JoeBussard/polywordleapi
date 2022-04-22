@@ -1,5 +1,29 @@
 #!/bin/python
 # copyright 2022 joe bussard
+########################################################
+#      backend_create_new_game.py                
+#                                              
+# Includes - GameState class.                      
+#          - text_colors class. (unused)        
+#          - create_keyboard_map function           
+#          - update_efficient_key_map function       
+# 
+# The GameState class contains all the data and
+# methods for a single game. After the game is over, 
+# it continues to hold the historical data for that 
+# game and a new GameState must be created to play
+# a new game.
+# 
+# The text_colors class is for coloring terminal output 
+# on unix machines.
+
+# The create_keyboard_map function maps alphabetical  
+# numbers to their initial state (plain) in QWERTY... 
+# order, using Python's sorted dictionary ability.
+
+# update_efficient_key_map updates the key map that 
+# uses letter color as keys and letters as values.
+##########################################################
 
 import re
 import random

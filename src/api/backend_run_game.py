@@ -1,5 +1,11 @@
 #!/bin/python
 # copyright 2022 joe bussard
+################################################3
+#    backend_run_game.py
+#
+# Includes  - process_new_guess function
+#           - validate_guess_input function
+
 
 import re
 import random
