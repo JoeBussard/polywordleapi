@@ -2,10 +2,11 @@
 
 **Welcome 😀 to the Polywordle API**
 
-You can download and run this API on your own server to host a game of 
-Polywordle. Just make your own client, (you could even use Postman or 
-`curl` if you are so inclined 😮) and you can play any time you want. You 
-get an infinite number of words per day.
+Polywordle is a server for playing wordle-type games.
+It uses a basic REST API for interacting with each client.
+Once the server is up and running, send requests to 127.0.0.1:5000 with game instructions. This can be done with a front-end client or even Postman or 
+`curl` if you are so inclined 😮. You can play any time you want. You 
+get an infinite number of words per day. Currently there are official front-end clients for Discord bots and PHP/HTML/CSS static web pages in development.
 
 ### Installation 🛠️
 
@@ -25,7 +26,7 @@ get an infinite number of words per day.
 
 `flask run`
 
-The API server will now be running at `127.0.0.1:5000`
+The server will now be running and API endpoints are at `127.0.0.1:5000`
 
 ### Interaction 🎮
 
