@@ -4,7 +4,7 @@
 
 Polywordle is a server for playing wordle-type games.
 It uses a basic REST API for interacting with each client.
-Once the server is up and running, send requests to 127.0.0.1:5000 with game instructions. This can be done with a front-end client or even Postman or 
+Once the server is up and running, send requests to `127.0.0.1:5000` with game instructions. This can be done with a front-end client or even Postman or 
 `curl` if you are so inclined 😮. You can play any time you want. You 
 get an infinite number of words per day. Currently there are official front-end clients for Discord bots and PHP/HTML/CSS static web pages in development.
 
