@@ -11,6 +11,7 @@ import json
 import backend_setup
 import backend_create_new_game
 import backend_run_game
+import custom_word
 from backend_setup import print_err
 
 app = Flask(__name__)
@@ -49,11 +50,9 @@ def api_new_game():
     del(newGameState)
     return "", 429
 
-
 @app.route('/v1/game', methods=['GET'])
 def api_new_game_wrong_method():
   return {"error":"Missing game ID in URL"}, 400
-
 
 # Getting status of game in cache
 @app.route('/v1/game/<game_uuid>', methods=['GET'])
@@ -68,7 +67,7 @@ def api_show_game(game_uuid):
     return response
 
 
-# Guessing new word
+# Guessing new word or making new solution
 @app.route('/v1/game/<game_uuid>', methods=['POST'])
 def api_game_new_guess(game_uuid):
   game_uuid = str(game_uuid)[:40]
@@ -78,20 +77,56 @@ def api_game_new_guess(game_uuid):
   if myCache.game_states[game_uuid].data['progress'] in ['victory', 'loss']:
     return {"error":"game already over"}, 200
 
+  current_guess = None
   if request.get_json() != None and 'guess' in request.get_json():
     current_guess = str(request.get_json()['guess'])[:8]
   elif request.form.get('guess') != None:
     current_guess = str(request.form.get('guess'))[:8]
+
+  new_solution = None
+  if request.get_json() != None and 'solution' in request.get_json():
+    new_solution = str(request.get_json()['solution'])[:6]
+  elif request.form.get('solution') != None:
+    new_solution = str(request.form.get('solution'))[:6]
+
+  if current_guess and new_solution:
+    return {"error": "cannot set custom word and make a new guess in one request"}, 400
+  if not current_guess and not new_solution:
+    return {"error": "post methods require either a custom word body or a new guess body."}, 400
+  
+  if current_guess:
+    print_err("Recieved new guess:",current_guess)
+    if current_guess in myCache.game_states[game_uuid].data['guess_history']:
+      return {"error": "duplicate guess"}, 200  
+    guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words) 
+    if "error" in guess_result:
+      return guess_result, 200
+    return {"success":"guess posted"}, 200
+
+  if new_solution:
+    print_err("Recieved new custom solution:", new_solution)
+    solution_result = custom_word.set_custom_solution(myCache.game_states[game_uuid], new_solution, all_words)
+    if "error" in solution_result:
+      return solution_result, 200
+    else:
+      return {"success":"custom solution set"}, 200
+
+
+# Custom words
+@app.route('/v2/game/<game_uuid>/custom', methods=['POST'])
+def api_game_custom_solution(game_uuid):
+  game_uuid = str(game_uuid)[:40]
+  if game_uuid not in myCache.game_states:
+    return {"error":"No game found for that UUID"}, 404
+  if request.get_json() != None and 'solution' in request.get_json():
+    new_solution = str(request.get_json()['solution'])[:6]
+  elif request.form.get('solution') != None:
+    new_solution = str(request.form.get('solution'))[:6]
   else:
-    return {"error":"POST methods require a guess"}, 400
-
-  print_err("Recieved guess:",current_guess)
-
-  if current_guess in myCache.game_states[game_uuid].data['guess_history']:
-    return {"error": "duplicate guess"}, 200
-
-  guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
-
-  if "error" in guess_result:
-    return guess_result, 200
-  return {"success":"guess posted"}, 200
+    return {"error":"Incomplete request did not include new custom solution"}, 400
+  print_err("Recieved new custom solution:", new_solution)
+  solution_result = custom_word.set_custom_solution(myCache.game_states[game_uuid], new_solution, all_words)
+  if "error" in solution_result:
+    return solution_result, 200
+  else:
+    return {"success":"custom solution set"}, 200
