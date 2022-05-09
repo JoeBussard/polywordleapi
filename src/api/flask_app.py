@@ -103,22 +103,3 @@ def api_game_new_guess(game_uuid):
       return guess_result, 200
     return {"success":"guess posted"}, 200
 
-
-# Custom words
-@app.route('/v2/game/<game_uuid>/custom', methods=['POST'])
-def api_game_custom_solution(game_uuid):
-  game_uuid = str(game_uuid)[:40]
-  if game_uuid not in myCache.game_states:
-    return {"error":"No game found for that UUID"}, 404
-  if request.get_json() != None and 'solution' in request.get_json():
-    new_solution = str(request.get_json()['solution'])[:6]
-  elif request.form.get('solution') != None:
-    new_solution = str(request.form.get('solution'))[:6]
-  else:
-    return {"error":"Incomplete request did not include new custom solution"}, 400
-  print_err("Recieved new custom solution:", new_solution)
-  solution_result = custom_word.set_custom_solution(myCache.game_states[game_uuid], new_solution, all_words)
-  if "error" in solution_result:
-    return solution_result, 200
-  else:
-    return {"success":"custom solution set"}, 200
