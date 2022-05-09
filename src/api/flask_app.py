@@ -59,10 +59,6 @@ def api_new_game():
   
   return {"game_uuid":newGameState.uuid()}, 200
 
-@app.route('/v1/game', methods=['GET'])
-def api_new_game_wrong_method():
-  return {"error":"Missing game ID in URL"}, 400
-
 # Getting status of game in cache
 @app.route('/v1/game/<game_uuid>', methods=['GET'])
 def api_show_game(game_uuid):
