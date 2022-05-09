@@ -31,10 +31,6 @@ myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 def hello_world():
   return "Polywordle is live at version /v1/", 200
 
-@app.route('/v1')
-def hello_world_v1():
-  return "Polywordle /v1/ is live. Send a POST to /v1/game to start a new game", 200
-
 # Creating a new game
 @app.route('/v1/game', methods=['POST'])
 @limiter.limit("30 per minute") 
