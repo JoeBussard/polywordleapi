@@ -29,6 +29,7 @@ import re
 import random
 import json
 import backend_setup
+from uuid import uuid4
 import requests
 from werkzeug.exceptions import TooManyRequests
 
@@ -50,16 +51,13 @@ text_hash = {'present':text_colors.YELLOW,'correct':text_colors.GREEN,'absent':t
 class GameState:
   # One game state per user
 
-  def __init__(self, uuid=None, user_id="Anon", fromCache=False, randomWord=True):
+  def __init__(self, given_uuid=None, user_id="Anon", fromCache=False, randomWord=True):
     backend_setup.print_err(f"initializing a new game state for {user_id}")
     if not fromCache:
       self.data = {}
       self.data['user_id'] = user_id
-      new_uuid = requests.get("https://www.uuidtools.com/api/generate/v4")
-      if new_uuid.status_code == 429:
-        raise TooManyRequests()
-      uuid_str = str(json.loads(new_uuid.content.decode('utf-8'))[0])
-      self.data['uuid'] = uuid_str
+      new_uuid = uuid4()
+      self.data['uuid'] = str(new_uuid)
       self.data['keyboard_map'] = create_keyboard_map()
       self.data['efficient_key_map'] = {
           'plain':[],
@@ -77,8 +75,8 @@ class GameState:
       self.data['progress'] = "in progress"
       self.data['public_solution'] = ""
     else:
-      if uuid:
-        self.create_new_from_cache(uuid)
+      if given_uuid:
+        self.create_new_from_cache(given_uuid)
       else:
         print("No game with uuid {uuid} exists.")
 
