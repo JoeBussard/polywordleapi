@@ -45,10 +45,25 @@ def api_new_game():
     result = myCache.save_game_state_to_cache(newGameState)
     if "error" in result:
       return result, 404
-    return {"game_uuid": newGameState.uuid()}, 200
+    game_uuid = result.uuid()
   except TooManyRequests as e:
     del(newGameState)
     return "", 429
+
+  custom_solution = None
+  if request.get_json() != None and 'solution' in request.get_json():
+    custom_solution = str(request.get_json()['solution'])[:6]
+  elif request.form.get('solution') != None:
+    custom_solution = str(request.form.get('solution'))[:6]
+  if custom_solution is not None:
+    print_err("Recieved new custom solution:", custom_solution)
+    solution_result = custom_word.set_custom_solution(myCache.game_states[game_uuid], custom_solution, all_words)
+    if "error" in solution_result:
+      return solution_result, 200
+
+  return 
+
+
 
 @app.route('/v1/game', methods=['GET'])
 def api_new_game_wrong_method():
@@ -83,16 +98,16 @@ def api_game_new_guess(game_uuid):
   elif request.form.get('guess') != None:
     current_guess = str(request.form.get('guess'))[:8]
 
-  new_solution = None
-  if request.get_json() != None and 'solution' in request.get_json():
-    new_solution = str(request.get_json()['solution'])[:6]
-  elif request.form.get('solution') != None:
-    new_solution = str(request.form.get('solution'))[:6]
+#  new_solution = None
+#  if request.get_json() != None and 'solution' in request.get_json():
+#    new_solution = str(request.get_json()['solution'])[:6]
+#  elif request.form.get('solution') != None:
+#    new_solution = str(request.form.get('solution'))[:6]
 
-  if current_guess and new_solution:
-    return {"error": "cannot set custom word and make a new guess in one request"}, 400
-  if not current_guess and not new_solution:
-    return {"error": "post methods require either a custom word body or a new guess body."}, 400
+#  if current_guess and new_solution:
+#    return {"error": "cannot set custom word and make a new guess in one request"}, 400
+#  if not current_guess and not new_solution:
+#    return {"error": "post methods require either a custom word body or a new guess body."}, 400
   
   if current_guess:
     print_err("Recieved new guess:",current_guess)
@@ -102,14 +117,15 @@ def api_game_new_guess(game_uuid):
     if "error" in guess_result:
       return guess_result, 200
     return {"success":"guess posted"}, 200
+  return "", 500
 
-  if new_solution:
-    print_err("Recieved new custom solution:", new_solution)
-    solution_result = custom_word.set_custom_solution(myCache.game_states[game_uuid], new_solution, all_words)
-    if "error" in solution_result:
-      return solution_result, 200
-    else:
-      return {"success":"custom solution set"}, 200
+#  if new_solution:
+#    print_err("Recieved new custom solution:", new_solution)
+#    solution_result = custom_word.set_custom_solution(myCache.game_states[game_uuid], new_solution, all_words)
+#    if "error" in solution_result:
+#      return solution_result, 200
+#    else:
+#      return {"success":"custom solution set"}, 200
 
 
 # Custom words
