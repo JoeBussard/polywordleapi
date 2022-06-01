@@ -4,6 +4,9 @@ from werkzeug.exceptions import TooManyRequests
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+from flask_cors import CORS
+
+
 
 import re
 import json
@@ -16,6 +19,7 @@ from backend_setup import print_err
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+CORS(app)
 
 limiter = Limiter(
     app,
@@ -30,6 +34,13 @@ myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 @app.route('/')
 def hello_world():
   return "Polywordle is live at version /v1/", 200
+
+@app.route('/v1')
+def list_endpoints():
+    return {"/v1/game, POST" : "Start a new game. Include /solution/ in request to set solution.",
+            "/v1/game/<game_uuid>, POST" : "Post a new guess - include /guess/ in request.",
+            "/v1/game/<game_uuid>, GET" : "Get the status of a given game."
+            }, 200
 
 # Creating a new game
 @app.route('/v1/game', methods=['POST'])
