@@ -29,8 +29,8 @@ get an infinite number of words per day. Currently there are official front-end 
 The server will now be running and API endpoints are at `127.0.0.1:5000`
 
 ### Interaction 🎮
-
-Have your client send an empty `POST` request to `/v1/game` to get
+changes that makes it work on laptop
+Have your client send an empty `POST` request to `/v1/newgame` to get
 a UUID for your game.
 
 Send a `GET` request to `/v1/game/<your_uuid>` to see your game's status
