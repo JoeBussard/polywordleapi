@@ -21,6 +21,7 @@ def process_new_guess(guess, game_state, all_words):
     check_for_bad_input = validate_guess_input(guess, all_words)
     if "error" in check_for_bad_input:
         return check_for_bad_input
+    #guess = guess.lower()
     solution = game_state.data['solution']
     new_progress_row, is_a_winner = compare_guess_to_solution(guess, solution)
     update_keyboard(game_state.data['keyboard_map'], new_progress_row, guess)
@@ -105,7 +106,7 @@ def update_guess_map(game_state):
 
 def prepare_json_response(game_state):
     game_state_data = game_state.data
-    response = game_state.get_public_data() 
+    response = game_state.get_public_data()
     for field in ['uuid', 'user_id', 'progress', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
         if field not in response:
             return {"error":"something wrong"}
