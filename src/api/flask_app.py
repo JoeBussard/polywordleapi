@@ -43,8 +43,8 @@ def list_endpoints():
             }, 200
 
 # Creating a new game
-@app.route('/v1/game', methods=['POST'])
-@limiter.limit("30 per minute") 
+@app.route('/v1/newgame', methods=['POST'])
+@limiter.limit("100 per minute")
 def api_new_game():
   newGameState = backend_create_new_game.GameState()
   newGameState.set_random_solution(common_words)
@@ -52,6 +52,7 @@ def api_new_game():
   if "error" in result:
     return result, 404
   game_uuid = newGameState.uuid()
+  return {"game_uuid":game_uuid}, 200
 
   custom_solution = None
   if request.get_json() != None and 'solution' in request.get_json():
@@ -63,7 +64,7 @@ def api_new_game():
     solution_result = custom_word.set_custom_solution(myCache.game_states[game_uuid], custom_solution, all_words)
     if "error" in solution_result:
       return solution_result, 200
-  
+
   return {"game_uuid":newGameState.uuid()}, 200
 
 # Getting status of game in cache
@@ -84,25 +85,27 @@ def api_show_game(game_uuid):
 def api_game_new_guess(game_uuid):
   game_uuid = str(game_uuid)[:40]
   if game_uuid not in myCache.game_states:
-    return {"error": "no game found for that UUID"}, 404 
+    return {"error": "no game found for that UUID"}, 404
 
   if myCache.game_states[game_uuid].data['progress'] in ['victory', 'loss']:
     return {"error":"game already over"}, 200
 
   current_guess = None
   if request.get_json() != None and 'guess' in request.get_json():
-    current_guess = str(request.get_json()['guess'])[:8]
+    current_guess = str(request.get_json()['guess'])[:8].lower()
   elif request.form.get('guess') != None:
-    current_guess = str(request.form.get('guess'))[:8]
- 
+    current_guess = str(request.form.get('guess'))[:8].lower()
+
   if not current_guess:
     return {"error":"POST methods require a guess."}, 400
   else:
     print_err("Recieved new guess:",current_guess)
     if current_guess in myCache.game_states[game_uuid].data['guess_history']:
-      return {"error": "duplicate guess"}, 200  
-    guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words) 
+      return {"error": "duplicate guess"}, 200
+    guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
     if "error" in guess_result:
       return guess_result, 200
     return {"success":"guess posted"}, 200
 
+if __name__ == '__main__':
+    app.run(debug=True,threaded=False)
