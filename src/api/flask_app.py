@@ -4,9 +4,7 @@ from werkzeug.exceptions import TooManyRequests
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from flask_cors import CORS
-
-
+#from flask_cors import CORS
 
 import re
 import json
@@ -19,7 +17,7 @@ from backend_setup import print_err
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
-CORS(app)
+#CORS(app)
 
 limiter = Limiter(
     app,
@@ -107,5 +105,6 @@ def api_game_new_guess(game_uuid):
       return guess_result, 200
     return {"success":"guess posted"}, 200
 
+
 if __name__ == '__main__':
-    app.run(debug=True,threaded=False)
+    app.run(threaded=False)
