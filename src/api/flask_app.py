@@ -104,3 +104,6 @@ def api_game_new_guess(game_uuid):
       return guess_result, 200
     return {"success":"guess posted"}, 200
 
+
+if __name__ == '__main__':
+    app.run(threaded=False)
