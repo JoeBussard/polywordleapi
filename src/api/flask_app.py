@@ -17,7 +17,7 @@ from backend_setup import print_err
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
-#CORS(app)
+CORS(app)
 
 limiter = Limiter(
     app,
