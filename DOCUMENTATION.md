@@ -10,7 +10,7 @@ You can create a new game. You can make guesses on that game. You get the status
 
 `/v1` - `<any method>` - Pings the server and responds how to start a new game
 
-`/v1/game` - `POST` - Creates a new game and returns the `game_uuid` in JSON format.
+`/v1/newgame` - `POST` - Creates a new game and returns the `game_uuid` in JSON format.
 
 `/v1/game/<uuid>` - `GET` - Returns the state of a game in JSON format
 
