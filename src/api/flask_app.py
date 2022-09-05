@@ -44,26 +44,32 @@ def list_endpoints():
 @app.route('/v1/newgame', methods=['POST'])
 @limiter.limit("100 per minute")
 def api_new_game():
-  newGameState = backend_create_new_game.GameState()
-  newGameState.set_random_solution(common_words)
-  result = myCache.save_game_state_to_cache(newGameState)
-  if "error" in result:
-    return result, 404
-  game_uuid = newGameState.uuid()
-  return {"game_uuid":game_uuid}, 200
+  if request.get_json(silent=True) == None and request.form.get('solution') == None:
+    # Assume a random game is requested
+    newGameState = backend_create_new_game.GameState()
+    newGameState.set_random_solution(common_words)
+    result = myCache.save_game_state_to_cache(newGameState)
+    if "error" in result:
+      return result, 404
+    game_uuid = newGameState.uuid()
+    return {"game_uuid":game_uuid}, 200
 
   custom_solution = None
-  if request.get_json() != None and 'solution' in request.get_json():
+  if request.get_json(silent=True) != None and 'solution' in request.get_json():
     custom_solution = str(request.get_json()['solution'])[:6]
   elif request.form.get('solution') != None:
     custom_solution = str(request.form.get('solution'))[:6]
+
   if custom_solution is not None:
     print_err("Recieved new custom solution:", custom_solution)
-    solution_result = custom_word.set_custom_solution(myCache.game_states[game_uuid], custom_solution, all_words)
+    newGameState = backend_create_new_game.GameState()
+    solution_result = custom_word.set_custom_solution(newGameState, custom_solution, all_words)
+    result = myCache.save_game_state_to_cache(newGameState)
     if "error" in solution_result:
-      return solution_result, 200
-
-  return {"game_uuid":newGameState.uuid()}, 200
+      return solution_result, 404
+    game_uuid = newGameState.uuid()
+    return {"game_uuid":game_uuid}, 200
+  return "", 500
 
 # Getting status of game in cache
 @app.route('/v1/game/<game_uuid>', methods=['GET'])
@@ -89,7 +95,7 @@ def api_game_new_guess(game_uuid):
     return {"error":"game already over"}, 200
 
   current_guess = None
-  if request.get_json() != None and 'guess' in request.get_json():
+  if request.get_json(silent=True) != None and 'guess' in request.get_json():
     current_guess = str(request.get_json()['guess'])[:8].lower()
   elif request.form.get('guess') != None:
     current_guess = str(request.form.get('guess'))[:8].lower()
