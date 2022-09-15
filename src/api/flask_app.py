@@ -56,6 +56,7 @@ def api_new_game():
 
   custom_solution = None
   if request.get_json(silent=True) != None and 'solution' in request.get_json():
+    print_err(request.get_json())
     custom_solution = str(request.get_json()['solution'])[:6]
   elif request.form.get('solution') != None:
     custom_solution = str(request.form.get('solution'))[:6]
