@@ -15,3 +15,5 @@ You can create a new game. You can make guesses on that game. You get the status
 `/v1/game/<uuid>` - `GET` - Returns the state of a game in JSON format
 
 `/v1/game/<uuid>` - `POST` - Posts a new guess to a game.  Requires that the user include a guess in the request body. Can be JSON or encoded in form.
+
+Game status JSON includes `is_custom_solution` (true when the game was created with a chosen solution) and `solution_is_real_word` (false when that chosen solution is not in the dictionary; guesses must then be real words or the exact solution).
