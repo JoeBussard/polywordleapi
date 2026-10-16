@@ -1,5 +1,4 @@
 import re
-import backend_setup
 
 FIVE_LETTERS = re.compile("[A-Za-z]{5}")
 

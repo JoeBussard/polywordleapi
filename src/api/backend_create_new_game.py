@@ -25,13 +25,9 @@
 # uses letter color as keys and letters as values.
 ##########################################################
 
-import re
 import random
-import json
 import backend_setup
 from uuid import uuid4
-import requests
-from werkzeug.exceptions import TooManyRequests
 
 CHEATING = False
 

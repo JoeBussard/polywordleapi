@@ -25,8 +25,6 @@
 # bootsrap a new instance of the Polywordle server.
 ########################################################
 
-import re
-import random
 import json
 from sys import stderr
 

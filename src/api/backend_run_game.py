@@ -8,10 +8,6 @@
 
 
 import re
-import random
-import json
-import backend_setup
-import backend_create_new_game
 
 
 def process_new_guess(guess, game_state, all_words):
