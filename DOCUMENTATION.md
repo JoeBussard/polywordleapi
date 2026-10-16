@@ -16,4 +16,4 @@ You can create a new game. You can make guesses on that game. You get the status
 
 `/v1/game/<uuid>` - `POST` - Posts a new guess to a game.  Requires that the user include a guess in the request body. Can be JSON or encoded in form.
 
-Game status JSON includes `is_custom_solution` (true when the game was created with a chosen solution) and `solution_is_real_word` (false when that chosen solution is not in the dictionary; guesses must still be dictionary words, or exactly the solution).
+Game status JSON includes `is_custom_solution` (true when the game was created with a chosen solution) and `solution_is_real_word` (false when that chosen solution is not in the dictionary: "silly mode". In silly mode a made-up guess is accepted and uses a turn but gives no clues: its letters come back as `plain` in `guess_map` and the keyboard map is unchanged. The guess response then has `made_up_guess: true`.).

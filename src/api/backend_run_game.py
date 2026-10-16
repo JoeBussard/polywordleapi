@@ -14,13 +14,20 @@ def process_new_guess(guess, game_state, all_words):
   # Does everything needed to process a new guess.
     if len(game_state.data['progress_grid_history']) > 5:
         return "game over"
-    check_for_bad_input = validate_guess_input(guess, all_words, game_state.data['solution'])
+    solution = game_state.data['solution']
+    solution_is_real_word = game_state.data.get('solution_is_real_word', True)
+    check_for_bad_input = validate_guess_input(guess, all_words, solution, solution_is_real_word)
     if "error" in check_for_bad_input:
         return check_for_bad_input
-    #guess = guess.lower()
-    solution = game_state.data['solution']
-    new_progress_row, is_a_winner = compare_guess_to_solution(guess, solution)
-    update_keyboard(game_state.data['keyboard_map'], new_progress_row, guess)
+    # Silly mode (made-up solution): a made-up guess is allowed and costs a turn, but gives no clues:
+    # every letter is marked "plain" and the keyboard is left alone.
+    made_up_guess = guess.lower() not in all_words and guess.lower() != solution
+    if made_up_guess:
+        new_progress_row = {i: "plain" for i in range(5)}
+        is_a_winner = 1
+    else:
+        new_progress_row, is_a_winner = compare_guess_to_solution(guess, solution)
+        update_keyboard(game_state.data['keyboard_map'], new_progress_row, guess)
     update_efficient_key_map(game_state)
     game_state.data['guess_history'].append(guess)
     game_state.data['progress_grid_history'].append(new_progress_row)
@@ -33,16 +40,17 @@ def process_new_guess(guess, game_state, all_words):
         if len(game_state.data['guess_history']) >= 6:
             game_state.data['public_solution'] = game_state.data['solution']
             game_state.data['progress'] = "loss"
-    return {"success":"game state updated"}
+    return {"success":"game state updated", "made_up_guess": made_up_guess}
 
-def validate_guess_input(guess, all_words, solution=None):
+def validate_guess_input(guess, all_words, solution=None, solution_is_real_word=True):
     if len(guess) != 5:
         return {"error": "Word must be 5 letters"}
     pattern = re.compile("[A-Za-z]+")
     if not pattern.fullmatch(guess):
         return {"error": "Word must be only letters"}
-    # A guess must be a dictionary word, or exactly the solution (which may be a made-up custom word).
-    if guess.lower() not in all_words and guess.lower() != solution:
+    # Dictionary mode: a guess must be a dictionary word. Silly mode (made-up solution): anything
+    # five letters long is accepted; process_new_guess() gives no clues for a made-up guess.
+    if solution_is_real_word and guess.lower() not in all_words:
         return {"error": "Word not in dictionary"}
     return {"success":""}
 
