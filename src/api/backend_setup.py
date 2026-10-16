@@ -46,7 +46,10 @@ def load_dicts_from_json():
         common_words = json.load(f)
     with open('all_words.json') as f:
         all_words = json.load(f)
-    return common_words, all_words
+    # all_words is only ever used for membership tests, so hand it out as a set: O(1) instead of
+    # building a list of 16k values on every guess (issue #49). common_words stays a dict because
+    # random solutions are picked by numeric key.
+    return common_words, set(all_words.values())
 
 class GameStateCache:
     # Class wide variables............

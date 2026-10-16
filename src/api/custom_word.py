@@ -21,7 +21,7 @@ def set_custom_solution(game_state, new_solution, all_words):
   if game_state.data['solution'] == new_solution:
     return {"error":"Solution already set to that word."}
   new_solution = str(new_solution)[:5].lower()
-  if new_solution not in list(all_words.values()):
+  if new_solution not in all_words:
     print(new_solution, "was not in dictionary")
     return {"error":"Solution is not in dictionary"}
   game_state.data['solution'] = new_solution
