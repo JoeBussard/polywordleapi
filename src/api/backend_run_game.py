@@ -45,7 +45,7 @@ def validate_guess_input(guess, all_words):
     pattern = re.compile("[A-Za-z]+")
     if not pattern.fullmatch(guess):
         return {"error": "Word must be only letters"}
-    if guess.lower() not in list(all_words.values()):
+    if guess.lower() not in all_words:
         return {"error": "Word not in dictionary"}
     return {"success":""}
 
