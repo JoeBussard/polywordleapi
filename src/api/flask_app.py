@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, request, redirect, url_for
-from werkzeug.exceptions import TooManyRequests
+from flask import Flask, request
 
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -8,7 +7,6 @@ from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import re
-import json
 
 import backend_setup
 import backend_create_new_game

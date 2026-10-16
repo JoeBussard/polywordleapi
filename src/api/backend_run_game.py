@@ -8,10 +8,6 @@
 
 
 import re
-import random
-import json
-import backend_setup
-import backend_create_new_game
 
 
 def process_new_guess(guess, game_state, all_words):
@@ -106,7 +102,6 @@ def update_guess_map(game_state):
 
 
 def prepare_json_response(game_state):
-    game_state_data = game_state.data
     response = game_state.get_public_data()
     for field in ['uuid', 'user_id', 'progress', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
         if field not in response:

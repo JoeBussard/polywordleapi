@@ -25,8 +25,6 @@
 # bootsrap a new instance of the Polywordle server.
 ########################################################
 
-import re
-import random
 import json
 from sys import stderr
 
@@ -76,7 +74,7 @@ class GameStateCache:
         self.cache_id = cache_id
         self.game_states = {}
         self.game_states_data = {}
-        print_err(f'Created a new game state cache.')
+        print_err('Created a new game state cache.')
 
 
     def save_game_state_to_cache(self, game_state_object):
@@ -128,7 +126,7 @@ class GameStateCache:
       ## Make sure you auth'ed before calling this
       if uuid in self.game_states_data.keys():
         print_err(f'Deleting game data for {uuid} from cache.')
-        del self.game_states_data[key]
+        del self.game_states_data[uuid]
         return True
       else:
         print_err(f'Cannot delete game data for {uuid} from cache: User not found')
