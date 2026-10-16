@@ -73,10 +73,8 @@ class GameState:
       self.data['is_custom_solution'] = False
       self.data['solution_is_real_word'] = True
     else:
-      if given_uuid:
-        self.create_new_from_cache(given_uuid)
-      else:
-        print("No game with uuid {uuid} exists.")
+      # restored from disk: the caller fills self.data
+      self.data = {}
 
 
   def uuid(self):

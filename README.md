@@ -42,3 +42,7 @@ That is all you need to play the game. Have fun.
 
 *This is a portfolio project by a new university grad. Let me know 
 if you like it and your company is hiring* 🎓
+
+### Persistence
+
+Set `POLYWORDLE_DB=/path/to/games.sqlite3` and games survive restarts (written through on every change, loaded at start, oldest evicted past 20,000). Unset, games live in memory only.

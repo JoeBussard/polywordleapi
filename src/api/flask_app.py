@@ -123,6 +123,7 @@ def api_game_new_guess(game_uuid):
     guess_result = backend_run_game.process_new_guess(current_guess, myCache.game_states[game_uuid], all_words)
     if "error" in guess_result:
       return guess_result, 200
+    myCache.save_game_state_to_cache(myCache.game_states[game_uuid])   # write the new turn through to disk
     return {"success":"guess posted"}, 200
 
 
