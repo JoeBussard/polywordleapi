@@ -50,6 +50,7 @@ def load_dicts_from_json():
 
 class GameStateCache:
     # Class wide variables............
+    MAX_GAMES = 20000   # ~ a few tens of MB; protects a small server from game-spam
 
     # to be used to make sure i don't save malicious or wrong data
     acceptable_state_fields = [
@@ -80,9 +81,11 @@ class GameStateCache:
         print_err(f'Updating game state for game {game_state_object.data["uuid"]} in cache {self.cache_id}')
       else:
         print_err(f'Saving new game state for game {game_state_object.data["uuid"]} in cache{self.cache_id}')
-        if len(self.game_states.keys()) > 1000000:
-          print_err(f'Rate limit: Refusing to create more than 1,000,000 games at a time')
-          return {"error":"Game state cache full"}
+        # Memory guard: keep at most MAX_GAMES games; evict the oldest when full.
+        if len(self.game_states) >= self.MAX_GAMES:
+          oldest_uuid = next(iter(self.game_states))
+          print_err(f'Cache full ({self.MAX_GAMES} games): evicting oldest game {oldest_uuid}')
+          del self.game_states[oldest_uuid]
       self.game_states[game_state_object.data['uuid']] = game_state_object
       return {"success":"game state updated/saved"}
 

@@ -16,7 +16,7 @@ get an infinite number of words per day. Currently there are official front-end 
 
 `cd polywordleapi`
 
-`pip install requirements.txt`
+`pip install -r requirements.txt`
 
 ### Running 👟
 

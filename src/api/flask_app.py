@@ -5,6 +5,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 import re
 import json
@@ -16,13 +17,17 @@ import custom_word
 from backend_setup import print_err
 
 app = Flask(__name__)
-app.config['JSON_SORT_KEYS'] = False
+# Behind a reverse proxy (Apache): trust one hop of X-Forwarded-For / -Proto so the
+# rate limiter sees the real client address instead of 127.0.0.1.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+app.json.sort_keys = False
 CORS(app)
 
 limiter = Limiter(
-    app,
-    key_func=get_remote_address,
-    default_limits=["90 per minute"]
+    get_remote_address,
+    app=app,
+    default_limits=["90 per minute"],
+    storage_uri="memory://",
     )
 
 # Initialize server
