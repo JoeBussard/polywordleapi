@@ -21,6 +21,8 @@ app = Flask(__name__)
 # rate limiter sees the real client address instead of 127.0.0.1.
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 app.json.sort_keys = False
+# Game requests are a few hundred bytes at most; refuse anything larger (413).
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024
 CORS(app)
 
 limiter = Limiter(
