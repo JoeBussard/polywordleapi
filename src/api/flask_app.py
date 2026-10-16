@@ -32,6 +32,9 @@ limiter = Limiter(
     storage_uri="memory://",
     )
 
+# A game id must look like a UUID (issue #70); anything else is a 404 without touching the cache.
+UUID_RE = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
+
 # Initialize server
 myCache, common_words, all_words = backend_setup.start_up_game_backend('A')
 
@@ -82,8 +85,8 @@ def api_new_game():
 # Getting status of game in cache
 @app.route('/v1/game/<game_uuid>', methods=['GET'])
 def api_show_game(game_uuid):
-  good_game_uuid = str(game_uuid)[:40]
-  if good_game_uuid not in myCache.game_states:
+  good_game_uuid = str(game_uuid).lower()
+  if not UUID_RE.match(good_game_uuid) or good_game_uuid not in myCache.game_states:
     return {"error":"game not found"}, 404
   response = backend_run_game.prepare_json_response(myCache.game_states[good_game_uuid])
   if "error" in response:
@@ -95,8 +98,8 @@ def api_show_game(game_uuid):
 # Guessing new word or making new solution
 @app.route('/v1/game/<game_uuid>', methods=['POST'])
 def api_game_new_guess(game_uuid):
-  game_uuid = str(game_uuid)[:40]
-  if game_uuid not in myCache.game_states:
+  game_uuid = str(game_uuid).lower()
+  if not UUID_RE.match(game_uuid) or game_uuid not in myCache.game_states:
     return {"error": "no game found for that UUID"}, 404
 
   if myCache.game_states[game_uuid].data['progress'] in ['victory', 'loss']:
