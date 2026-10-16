@@ -79,7 +79,7 @@ def api_new_game():
     if problem is not None:
       return problem, 200
     newGameState = backend_create_new_game.GameState()
-    custom_word.set_custom_solution(newGameState, custom_solution)
+    custom_word.set_custom_solution(newGameState, custom_solution, all_words)
     result = myCache.save_game_state_to_cache(newGameState)
     if "error" in result:
       return result, 404

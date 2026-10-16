@@ -74,6 +74,8 @@ class GameState:
       self.data['guess_map'] = []
       self.data['progress'] = "in progress"
       self.data['public_solution'] = ""
+      self.data['is_custom_solution'] = False
+      self.data['solution_is_real_word'] = True
     else:
       if given_uuid:
         self.create_new_from_cache(given_uuid)

@@ -18,7 +18,7 @@ def process_new_guess(guess, game_state, all_words):
   # Does everything needed to process a new guess.
     if len(game_state.data['progress_grid_history']) > 5:
         return "game over"
-    check_for_bad_input = validate_guess_input(guess, all_words)
+    check_for_bad_input = validate_guess_input(guess, all_words, game_state.data['solution'])
     if "error" in check_for_bad_input:
         return check_for_bad_input
     #guess = guess.lower()
@@ -39,13 +39,14 @@ def process_new_guess(guess, game_state, all_words):
             game_state.data['progress'] = "loss"
     return {"success":"game state updated"}
 
-def validate_guess_input(guess, all_words):
+def validate_guess_input(guess, all_words, solution=None):
     if len(guess) != 5:
         return {"error": "Word must be 5 letters"}
     pattern = re.compile("[A-Za-z]+")
     if not pattern.fullmatch(guess):
         return {"error": "Word must be only letters"}
-    if guess.lower() not in all_words:
+    # A guess must be a real word, or exactly the solution (which may be a made-up custom word).
+    if guess.lower() not in all_words and guess.lower() != solution:
         return {"error": "Word not in dictionary"}
     return {"success":""}
 
