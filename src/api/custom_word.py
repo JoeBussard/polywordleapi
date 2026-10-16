@@ -12,8 +12,8 @@ def validate_custom_solution(new_solution, all_words):
     return {"error": "Word must be 5 letters"}
   if not FIVE_LETTERS.fullmatch(new_solution):
     return {"error": "Word must be only a-z letters."}
-  # Made-up words are allowed as custom solutions (issue #54, ruleset 2): the game records
-  # whether the solution is a real word, and guesses must be real words or the exact solution.
+  # Made-up words are allowed as custom solutions (issue #54, ruleset 1): the game records
+  # whether the solution is a real word; when it is not, guesses need not be real words either.
   return None
 
 def set_custom_solution(game_state, new_solution, all_words):
