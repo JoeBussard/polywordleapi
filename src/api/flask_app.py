@@ -124,7 +124,7 @@ def api_game_new_guess(game_uuid):
     if "error" in guess_result:
       return guess_result, 200
     myCache.save_game_state_to_cache(myCache.game_states[game_uuid])   # write the new turn through to disk
-    return {"success":"guess posted"}, 200
+    return {"success":"guess posted", "made_up_guess": guess_result.get("made_up_guess", False)}, 200
 
 
 if __name__ == '__main__':
