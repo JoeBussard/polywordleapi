@@ -111,6 +111,9 @@ class GameState:
       public_data['public_solution'] = self.data['public_solution']
     for field in ['uuid', 'user_id', 'progress', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
       public_data[field] = self.data[field]
+    # issue #60: players should know up front that a solution is custom, and whether it is a real word
+    public_data['is_custom_solution'] = self.data.get('is_custom_solution', False)
+    public_data['solution_is_real_word'] = self.data.get('solution_is_real_word', True)
     return public_data
 
 # replace this with UUID
