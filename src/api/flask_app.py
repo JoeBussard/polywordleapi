@@ -73,11 +73,16 @@ def api_new_game():
 
   if custom_solution is not None:
     print_err("Recieved new custom solution:", custom_solution)
+    # Validate first; a game state is only created once the solution is known to be acceptable.
+    # A rejected word is a game-rules violation, so it is a 200 with an error field, not a 404.
+    problem = custom_word.validate_custom_solution(custom_solution, all_words)
+    if problem is not None:
+      return problem, 200
     newGameState = backend_create_new_game.GameState()
-    solution_result = custom_word.set_custom_solution(newGameState, custom_solution, all_words)
+    custom_word.set_custom_solution(newGameState, custom_solution)
     result = myCache.save_game_state_to_cache(newGameState)
-    if "error" in solution_result:
-      return solution_result, 404
+    if "error" in result:
+      return result, 404
     game_uuid = newGameState.uuid()
     return {"game_uuid":game_uuid}, 200
   return "", 500
