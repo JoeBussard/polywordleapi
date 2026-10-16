@@ -26,6 +26,9 @@
 ########################################################
 
 import json
+import os
+import sqlite3
+import time
 from sys import stderr
 
 def print_err(*args, **kwargs):
@@ -68,13 +71,41 @@ class GameStateCache:
         'current_guess'
         ]
 
-    def __init__(self, cache_id):
+    def __init__(self, cache_id, db_path=None):
       ## I will use some sort of hashing function to use different caches
       ## If i ever scale to that point
         self.cache_id = cache_id
         self.game_states = {}
         self.game_states_data = {}
-        print_err('Created a new game state cache.')
+        # issue #73: games are kept in memory for speed but written through to SQLite so a
+        # restart does not forget them. db_path None = memory only (tests, local runs).
+        self.db = None
+        if db_path:
+          self.db = sqlite3.connect(db_path, check_same_thread=False)
+          self.db.execute('create table if not exists games (uuid text primary key, data text not null, updated real not null)')
+          self.db.commit()
+          self._load_from_db()
+        print_err(f'Created a new game state cache ({"sqlite: " + db_path if db_path else "memory only"}).')
+
+    def _load_from_db(self):
+      import backend_create_new_game
+      rows = self.db.execute('select uuid, data from games order by updated').fetchall()
+      for uuid, data in rows:
+        gs = backend_create_new_game.GameState(fromCache=True)
+        gs.data = json.loads(data)
+        self.game_states[uuid] = gs
+      print_err(f'Loaded {len(rows)} games from disk.')
+
+    def _persist(self, game_state_object):
+      if self.db is None: return
+      self.db.execute('insert or replace into games (uuid, data, updated) values (?, ?, ?)',
+                      (game_state_object.data['uuid'], json.dumps(game_state_object.data), time.time()))
+      self.db.commit()
+
+    def _forget(self, uuid):
+      if self.db is None: return
+      self.db.execute('delete from games where uuid = ?', (uuid,))
+      self.db.commit()
 
 
     def save_game_state_to_cache(self, game_state_object):
@@ -87,7 +118,9 @@ class GameStateCache:
           oldest_uuid = next(iter(self.game_states))
           print_err(f'Cache full ({self.MAX_GAMES} games): evicting oldest game {oldest_uuid}')
           del self.game_states[oldest_uuid]
+          self._forget(oldest_uuid)
       self.game_states[game_state_object.data['uuid']] = game_state_object
+      self._persist(game_state_object)
       return {"success":"game state updated/saved"}
 
     def save_game_data_to_cache(self, uuid, game_data):
@@ -147,7 +180,8 @@ def start_up_game_backend(cache_id):
     """ Boot strapping the game server"""
     print_err("Booting up Polywordle v.0.0.1")
 
-    my_cache = GameStateCache(cache_id)
+    # POLYWORDLE_DB=/path/to/games.sqlite3 turns on persistence; unset = memory only.
+    my_cache = GameStateCache(cache_id, os.environ.get('POLYWORDLE_DB') or None)
 
     common_words, all_words = load_dicts_from_json()
 
