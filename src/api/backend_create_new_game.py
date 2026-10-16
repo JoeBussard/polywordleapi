@@ -101,8 +101,9 @@ class GameState:
 
   def get_public_data(self):
     # For returning parts of data that should be given to the client, ie, not the solution.
+    # Building this small dict per request is cheap (it must reflect the current turn), so no
+    # caching is needed; the per-request log line was just noise (issue #61).
     public_data = {}
-    backend_setup.print_err(f'Creating new dictionary object for public data for {self.data["uuid"]}.')
     if self.data['public_solution'] != "":
       public_data['public_solution'] = self.data['public_solution']
     for field in ['uuid', 'user_id', 'progress', 'turn', 'guess_history', 'guess_map', 'efficient_key_map']:
